@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { QuestionGroup, ConditionalLogicEngine } from './questions';
+import { QuestionGroup, ConditionalLogicEngine, QuestionRenderer } from './questions';
 import type { AnyQuestion, QuestionResponse, FormState, Priority } from './questions';
 import type { QuestionGroupType as QGroupType } from './questions/types';
 
@@ -202,6 +202,70 @@ const QuestionsDemo: React.FC = () => {
     },
   ];
 
+  // Individual questions not in any group
+  const individualQuestions: AnyQuestion[] = [
+    {
+      id: 'consent',
+      type: 'true-false',
+      text: 'I consent to the processing of my data',
+      description: 'Required for form submission',
+      required: true,
+      priority: 'critical',
+      tags: ['legal'],
+      trueLabel: 'I agree',
+      falseLabel: 'I do not agree',
+    },
+    {
+      id: 'newsletter',
+      type: 'true-false',
+      text: 'Would you like to receive our newsletter?',
+      description: 'Optional - Get updates about new opportunities',
+      required: false,
+      priority: 'low',
+      tags: ['marketing'],
+      trueLabel: 'Yes, subscribe me',
+      falseLabel: 'No thanks',
+    },
+    {
+      id: 'referral',
+      type: 'short-answer',
+      text: 'How did you hear about us?',
+      placeholder: 'e.g., Google, Friend, LinkedIn',
+      required: false,
+      priority: 'low',
+      tags: ['marketing'],
+      maxLength: 200,
+    },
+    {
+      id: 'urgency',
+      type: 'multiple-choice',
+      text: 'How soon do you need a response?',
+      required: true,
+      priority: 'high' as Priority,
+      tags: ['timing'],
+      options: [
+        { id: 'asap', label: 'ASAP', description: 'Within 24 hours' },
+        { id: 'week', label: 'This week', description: 'Within 7 days' },
+        { id: 'month', label: 'This month', description: 'Within 30 days' },
+        { id: 'flexible', label: 'I\'m flexible', description: 'No rush' },
+      ],
+      multiple: false,
+      showOther: false,
+    },
+    {
+      id: 'additional-comments',
+      type: 'long-form',
+      text: 'Any additional comments or questions?',
+      placeholder: 'Feel free to share any other thoughts...',
+      required: false,
+      priority: 'low',
+      tags: ['feedback'],
+      maxLength: 1000,
+      rows: 4,
+      enableMarkdown: false,
+    },
+  ];
+
   const questionGroups: QGroupType[] = [
     {
       id: 'personal',
@@ -248,8 +312,9 @@ const QuestionsDemo: React.FC = () => {
   ];
 
   useEffect(() => {
-    // Initialize conditional logic engine
-    const engine = new ConditionalLogicEngine(sampleQuestions, {});
+    // Initialize conditional logic engine with all questions (grouped and individual)
+    const allQuestions = [...sampleQuestions, ...individualQuestions];
+    const engine = new ConditionalLogicEngine(allQuestions, {});
     setConditionalEngine(engine);
     setVisibleQuestions(engine.getVisibleQuestions());
   }, []);
@@ -311,7 +376,8 @@ const QuestionsDemo: React.FC = () => {
     });
 
     if (conditionalEngine) {
-      const engine = new ConditionalLogicEngine(sampleQuestions, {});
+      const allQuestions = [...sampleQuestions, ...individualQuestions];
+      const engine = new ConditionalLogicEngine(allQuestions, {});
       setConditionalEngine(engine);
       setVisibleQuestions(engine.getVisibleQuestions());
     }
@@ -348,6 +414,37 @@ const QuestionsDemo: React.FC = () => {
         </div>
 
         <div className="space-y-6">
+          {/* Individual Questions (not in groups) */}
+          <div className="bg-white rounded-lg shadow-md p-6">
+            <h2 className="text-xl font-semibold text-gray-900 mb-4">Quick Questions</h2>
+            <p className="text-sm text-gray-600 mb-6">Please answer these initial questions before proceeding to the main form.</p>
+            <div className="space-y-4">
+              {individualQuestions
+                .filter(q => visibleQuestions.has(q.id))
+                .map((question) => (
+                  <div key={question.id} className="border-l-4 border-blue-500 pl-4">
+                    {question.required && (
+                      <span className="inline-block px-2 py-1 text-xs font-medium text-red-600 bg-red-50 rounded mb-2">
+                        Required
+                      </span>
+                    )}
+                    {!question.required && (
+                      <span className="inline-block px-2 py-1 text-xs font-medium text-green-600 bg-green-50 rounded mb-2">
+                        Optional
+                      </span>
+                    )}
+                    <QuestionRenderer
+                      question={question}
+                      value={formState.responses[question.id]?.value}
+                      onChange={(value) => handleQuestionChange(question.id, value)}
+                      disabled={formState.isSubmitting}
+                    />
+                  </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Question Groups */}
           {questionGroups.map((group) => (
             <QuestionGroup
               key={group.id}
