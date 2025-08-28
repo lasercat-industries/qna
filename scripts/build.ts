@@ -1,4 +1,4 @@
 await Bun.build({
-  entrypoints: ['./src/index.ts'],
+  entrypoints: ['./src/questions/index.ts'],
   outdir: 'dist',
 });
