@@ -1,4 +1,5 @@
 await Bun.build({
-  entrypoints: ['./src/questions/index.ts'],
+  entrypoints: ['./src/index.ts'],
   outdir: 'dist',
+  external: ['react-dom', 'react'], // default: []
 });
