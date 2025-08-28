@@ -18,6 +18,7 @@ export const Slider: React.FC<QuestionComponentProps<number | [number, number]>>
     [q.dual, q.min, q.max],
   );
   const [localValue, setLocalValue] = useState<number | [number, number]>(value ?? defaultValue);
+  const [activeThumb, setActiveThumb] = useState<number | null>(null);
 
   useEffect(() => {
     setLocalValue(value ?? defaultValue);
@@ -35,11 +36,11 @@ export const Slider: React.FC<QuestionComponentProps<number | [number, number]>>
     const updated: [number, number] = [...localValue] as [number, number];
     updated[index] = newValue;
 
-    // Ensure min <= max
+    // Ensure min <= max without auto-adjusting the other value
     if (index === 0 && updated[0] > updated[1]) {
-      updated[1] = updated[0];
-    } else if (index === 1 && updated[1] < updated[0]) {
       updated[0] = updated[1];
+    } else if (index === 1 && updated[1] < updated[0]) {
+      updated[1] = updated[0];
     }
 
     setLocalValue(updated);
@@ -62,6 +63,21 @@ export const Slider: React.FC<QuestionComponentProps<number | [number, number]>>
     const leftPercent = percentage(values[0]);
     const rightPercent = percentage(values[1]);
 
+    const handlePointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
+      if (disabled || readOnly) return;
+      const rect = e.currentTarget.getBoundingClientRect();
+      const x = ((e.clientX - rect.left) / rect.width) * 100;
+      const distToLeft = Math.abs(x - leftPercent);
+      const distToRight = Math.abs(x - rightPercent);
+
+      // Set which thumb should be active based on proximity
+      if (distToLeft < distToRight) {
+        setActiveThumb(0);
+      } else {
+        setActiveThumb(1);
+      }
+    };
+
     return (
       <QuestionWrapper<[number, number]>
         className={className}
@@ -77,8 +93,12 @@ export const Slider: React.FC<QuestionComponentProps<number | [number, number]>>
         onValidate={onValidate as ((value: [number, number]) => string[]) | undefined}
       >
         <div className="space-y-4">
-          <div className="relative pt-6 pb-2">
-            <div className="relative h-2 bg-gray-200 rounded-full">
+          <div
+            className="relative py-4"
+            onPointerMove={handlePointerMove}
+            onPointerLeave={() => setActiveThumb(null)}
+          >
+            <div className="relative h-2 bg-gray-200 rounded-full overflow-visible">
               <div
                 className="absolute h-2 bg-blue-500 rounded-full"
                 style={{
@@ -87,14 +107,36 @@ export const Slider: React.FC<QuestionComponentProps<number | [number, number]>>
                 }}
               />
 
+              <div
+                className="absolute w-5 h-5 bg-blue-600 rounded-full shadow-md -translate-x-1/2 -translate-y-1/2"
+                style={{
+                  left: `${leftPercent}%`,
+                  top: '50%',
+                  pointerEvents: 'none',
+                }}
+              />
+              <div
+                className="absolute w-5 h-5 bg-blue-600 rounded-full shadow-md -translate-x-1/2 -translate-y-1/2"
+                style={{
+                  left: `${rightPercent}%`,
+                  top: '50%',
+                  pointerEvents: 'none',
+                }}
+              />
+
               <input
                 aria-label={`${q.text} - Minimum value`}
-                className="absolute w-full -top-1 opacity-0 cursor-pointer"
+                className="absolute w-full h-5 opacity-0 cursor-pointer"
                 disabled={disabled || readOnly}
                 max={q.max}
                 min={q.min}
                 step={q.step}
-                style={{ pointerEvents: disabled || readOnly ? 'none' : 'auto' }}
+                style={{
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  pointerEvents: disabled || readOnly || activeThumb === 1 ? 'none' : 'auto',
+                  zIndex: activeThumb === 0 ? 10 : 1,
+                }}
                 type="range"
                 value={values[0]}
                 onChange={(e) => handleDualChange(0, parseFloat(e.target.value))}
@@ -102,24 +144,20 @@ export const Slider: React.FC<QuestionComponentProps<number | [number, number]>>
 
               <input
                 aria-label={`${q.text} - Maximum value`}
-                className="absolute w-full -top-1 opacity-0 cursor-pointer"
+                className="absolute w-full h-5 opacity-0 cursor-pointer"
                 disabled={disabled || readOnly}
                 max={q.max}
                 min={q.min}
                 step={q.step}
-                style={{ pointerEvents: disabled || readOnly ? 'none' : 'auto' }}
+                style={{
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  pointerEvents: disabled || readOnly || activeThumb === 0 ? 'none' : 'auto',
+                  zIndex: activeThumb === 1 ? 10 : 2,
+                }}
                 type="range"
                 value={values[1]}
                 onChange={(e) => handleDualChange(1, parseFloat(e.target.value))}
-              />
-
-              <div
-                className="absolute w-4 h-4 bg-blue-600 rounded-full -top-1 shadow-md"
-                style={{ left: `calc(${leftPercent}% - 8px)` }}
-              />
-              <div
-                className="absolute w-4 h-4 bg-blue-600 rounded-full -top-1 shadow-md"
-                style={{ left: `calc(${rightPercent}% - 8px)` }}
               />
             </div>
 
@@ -227,6 +265,28 @@ export const Slider: React.FC<QuestionComponentProps<number | [number, number]>>
           border-radius: 50%;
           box-shadow: 0 2px 4px rgba(0,0,0,0.2);
           border: none;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+          appearance: none;
+          width: 20px;
+          height: 20px;
+          background: transparent;
+          cursor: pointer;
+          border-radius: 50%;
+          position: relative;
+          z-index: 10;
+        }
+        
+        input[type="range"]::-moz-range-thumb {
+          width: 20px;
+          height: 20px;
+          background: transparent;
+          cursor: pointer;
+          border-radius: 50%;
+          border: none;
+          position: relative;
+          z-index: 10;
         }
       `}</style>
     </QuestionWrapper>
