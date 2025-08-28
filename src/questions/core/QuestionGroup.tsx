@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import type { QuestionGroup as QuestionGroupType, QuestionResponse, Priority } from '../types';
+import type { QuestionGroupType, QuestionResponse, Priority } from '../types';
 import QuestionRenderer from './QuestionRenderer';
 
 interface QuestionGroupProps {
@@ -17,9 +17,9 @@ const getPriorityBadge = (priority: Priority) => {
     critical: 'bg-red-100 text-red-800',
     high: 'bg-orange-100 text-orange-800',
     medium: 'bg-yellow-100 text-yellow-800',
-    low: 'bg-gray-100 text-gray-800'
+    low: 'bg-gray-100 text-gray-800',
   };
-  
+
   return (
     <span className={`px-2 py-1 text-xs font-medium rounded-full ${colors[priority]}`}>
       {priority}
@@ -34,7 +34,7 @@ export const QuestionGroup: React.FC<QuestionGroupProps> = ({
   onGroupComplete,
   disabled = false,
   readOnly = false,
-  className = ''
+  className = '',
 }) => {
   const [isExpanded, setIsExpanded] = useState(group.defaultExpanded ?? true);
   const [completedQuestions, setCompletedQuestions] = useState<Set<string>>(new Set());
@@ -42,14 +42,14 @@ export const QuestionGroup: React.FC<QuestionGroupProps> = ({
 
   useEffect(() => {
     // Initialize all questions as visible
-    const initialVisible = new Set(group.questions.map(q => q.id));
+    const initialVisible = new Set(group.questions.map((q) => q.id));
     setVisibleQuestions(initialVisible);
   }, [group.questions]);
 
   useEffect(() => {
     // Track completed questions
     const completed = new Set<string>();
-    group.questions.forEach(question => {
+    group.questions.forEach((question) => {
       const response = responses[question.id];
       if (response && response.valid) {
         completed.add(question.id);
@@ -58,9 +58,11 @@ export const QuestionGroup: React.FC<QuestionGroupProps> = ({
     setCompletedQuestions(completed);
 
     // Check if group is complete
-    const requiredQuestions = group.questions.filter(q => q.required && visibleQuestions.has(q.id));
-    const allRequiredComplete = requiredQuestions.every(q => completed.has(q.id));
-    
+    const requiredQuestions = group.questions.filter(
+      (q) => q.required && visibleQuestions.has(q.id),
+    );
+    const allRequiredComplete = requiredQuestions.every((q) => completed.has(q.id));
+
     if (allRequiredComplete && requiredQuestions.length > 0 && onGroupComplete) {
       onGroupComplete(group.id);
     }
@@ -79,7 +81,7 @@ export const QuestionGroup: React.FC<QuestionGroupProps> = ({
   const progress = Math.round((completedQuestions.size / group.questions.length) * 100);
 
   return (
-    <div 
+    <div
       className={`
         question-group 
         border rounded-lg shadow-sm bg-white
@@ -87,7 +89,7 @@ export const QuestionGroup: React.FC<QuestionGroupProps> = ({
       `}
       data-group-id={group.id}
     >
-      <div 
+      <div
         className={`
           flex items-center justify-between p-4 border-b
           ${group.collapsible ? 'cursor-pointer hover:bg-gray-50' : ''}
@@ -101,29 +103,30 @@ export const QuestionGroup: React.FC<QuestionGroupProps> = ({
               className="text-gray-500 hover:text-gray-700 focus:outline-none"
               type="button"
             >
-              <svg 
-                className={`w-5 h-5 transform transition-transform ${isExpanded ? 'rotate-90' : ''}`} 
-                fill="currentColor" 
+              <svg
+                className={`w-5 h-5 transform transition-transform ${isExpanded ? 'rotate-90' : ''}`}
+                fill="currentColor"
                 viewBox="0 0 20 20"
               >
-                <path d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" fillRule="evenodd" />
+                <path
+                  d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
+                  fillRule="evenodd"
+                />
               </svg>
             </button>
           )}
-          
+
           <div>
             <h3 className="text-lg font-semibold text-gray-900">{group.name}</h3>
-            {group.description && (
-              <p className="text-sm text-gray-600 mt-1">{group.description}</p>
-            )}
+            {group.description && <p className="text-sm text-gray-600 mt-1">{group.description}</p>}
           </div>
         </div>
 
         <div className="flex items-center gap-3">
           {group.tags.length > 0 && (
             <div className="flex gap-1">
-              {group.tags.map(tag => (
-                <span 
+              {group.tags.map((tag) => (
+                <span
                   key={tag}
                   className="px-2 py-1 text-xs bg-gray-100 text-gray-600 rounded-full"
                 >
@@ -132,15 +135,15 @@ export const QuestionGroup: React.FC<QuestionGroupProps> = ({
               ))}
             </div>
           )}
-          
+
           {getPriorityBadge(group.priority)}
-          
+
           <div className="flex items-center gap-2">
             <div className="text-sm text-gray-600">
               {completedQuestions.size}/{group.questions.length}
             </div>
             <div className="w-24 h-2 bg-gray-200 rounded-full overflow-hidden">
-              <div 
+              <div
                 className="h-full bg-green-500 transition-all duration-300"
                 style={{ width: `${progress}%` }}
               />
@@ -160,19 +163,15 @@ export const QuestionGroup: React.FC<QuestionGroupProps> = ({
             const isCompleted = completedQuestions.has(question.id);
 
             return (
-              <div 
+              <div
                 key={question.id}
                 className={`
                   relative
                   ${index < group.questions.length - 1 ? 'pb-6 border-b' : ''}
                 `}
               >
-                {isCompleted && (
-                  <div className="absolute -left-8 top-3 text-green-500">
-                    ✓
-                  </div>
-                )}
-                
+                {isCompleted && <div className="absolute -left-8 top-3 text-green-500">✓</div>}
+
                 <QuestionRenderer
                   disabled={disabled}
                   error={response?.errors?.[0]}

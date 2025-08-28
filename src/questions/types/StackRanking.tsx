@@ -10,7 +10,7 @@ export const StackRanking: React.FC<QuestionComponentProps<string[]>> = ({
   disabled = false,
   readOnly = false,
   error,
-  className = ''
+  className = '',
 }) => {
   const q = question as StackRankingQuestion;
   const [items, setItems] = useState<StackRankingItem[]>([]);
@@ -21,11 +21,11 @@ export const StackRanking: React.FC<QuestionComponentProps<string[]>> = ({
     // Initialize items based on value or default order
     if (value && value.length > 0) {
       const orderedItems = value
-        .map(id => q.items.find(item => item.id === id))
+        .map((id) => q.items.find((item) => item.id === id))
         .filter(Boolean) as StackRankingItem[];
-      
+
       // Add any missing items at the end
-      const missingItems = q.items.filter(item => !value.includes(item.id));
+      const missingItems = q.items.filter((item) => !value.includes(item.id));
       setItems([...orderedItems, ...missingItems]);
     } else {
       setItems([...q.items]);
@@ -34,9 +34,9 @@ export const StackRanking: React.FC<QuestionComponentProps<string[]>> = ({
 
   const handleDragStart = (e: React.DragEvent, itemId: string) => {
     if (disabled || readOnly) return;
-    const item = items.find(i => i.id === itemId);
+    const item = items.find((i) => i.id === itemId);
     if (item?.fixed) return;
-    
+
     setDraggedItem(itemId);
     e.dataTransfer.effectAllowed = 'move';
   };
@@ -44,10 +44,10 @@ export const StackRanking: React.FC<QuestionComponentProps<string[]>> = ({
   const handleDragOver = (e: React.DragEvent, itemId: string) => {
     e.preventDefault();
     if (disabled || readOnly || !draggedItem) return;
-    
-    const item = items.find(i => i.id === itemId);
+
+    const item = items.find((i) => i.id === itemId);
     if (item?.fixed) return;
-    
+
     if (itemId !== draggedItem) {
       setDragOverItem(itemId);
     }
@@ -65,24 +65,24 @@ export const StackRanking: React.FC<QuestionComponentProps<string[]>> = ({
       return;
     }
 
-    const targetItem = items.find(i => i.id === targetId);
+    const targetItem = items.find((i) => i.id === targetId);
     if (targetItem?.fixed) {
       setDraggedItem(null);
       setDragOverItem(null);
       return;
     }
 
-    const draggedIndex = items.findIndex(i => i.id === draggedItem);
-    const targetIndex = items.findIndex(i => i.id === targetId);
+    const draggedIndex = items.findIndex((i) => i.id === draggedItem);
+    const targetIndex = items.findIndex((i) => i.id === targetId);
 
     if (draggedIndex !== -1 && targetIndex !== -1) {
       const newItems = [...items];
       const [removed] = newItems.splice(draggedIndex, 1);
       if (removed) {
         newItems.splice(targetIndex, 0, removed);
-        
+
         setItems(newItems);
-        const newValue = newItems.map(item => item.id);
+        const newValue = newItems.map((item) => item.id);
         onChange(newValue);
       }
     }
@@ -93,11 +93,11 @@ export const StackRanking: React.FC<QuestionComponentProps<string[]>> = ({
 
   const handleKeyDown = (e: React.KeyboardEvent, itemId: string) => {
     if (disabled || readOnly) return;
-    
-    const item = items.find(i => i.id === itemId);
+
+    const item = items.find((i) => i.id === itemId);
     if (item?.fixed) return;
 
-    const currentIndex = items.findIndex(i => i.id === itemId);
+    const currentIndex = items.findIndex((i) => i.id === itemId);
     let newIndex = currentIndex;
 
     switch (e.key) {
@@ -128,9 +128,9 @@ export const StackRanking: React.FC<QuestionComponentProps<string[]>> = ({
       const [removed] = newItems.splice(currentIndex, 1);
       if (removed) {
         newItems.splice(newIndex, 0, removed);
-        
+
         setItems(newItems);
-        const newValue = newItems.map(item => item.id);
+        const newValue = newItems.map((item) => item.id);
         onChange(newValue);
       }
 
@@ -149,15 +149,13 @@ export const StackRanking: React.FC<QuestionComponentProps<string[]>> = ({
       error={error}
       question={question}
       readOnly={readOnly}
-      value={items.map(i => i.id)}
+      value={items.map((i) => i.id)}
       onChange={onChange}
       onValidate={onValidate}
     >
       <div className="space-y-2">
         {q.maxSelections && (
-          <div className="text-sm text-gray-600 mb-2">
-            Select up to {q.maxSelections} items
-          </div>
+          <div className="text-sm text-gray-600 mb-2">Select up to {q.maxSelections} items</div>
         )}
 
         <div className="space-y-2">
@@ -219,7 +217,7 @@ export const StackRanking: React.FC<QuestionComponentProps<string[]>> = ({
                       if (removed) {
                         newItems.splice(newIndex, 0, removed);
                         setItems(newItems);
-                        onChange(newItems.map(i => i.id));
+                        onChange(newItems.map((i) => i.id));
                       }
                     }
                   }}
@@ -236,7 +234,9 @@ export const StackRanking: React.FC<QuestionComponentProps<string[]>> = ({
         </div>
 
         <div className="text-xs text-gray-500 mt-2">
-          {items.some(i => i.fixed) ? '📌 Fixed items cannot be moved' : 'Drag items or use arrow keys to reorder'}
+          {items.some((i) => i.fixed)
+            ? '📌 Fixed items cannot be moved'
+            : 'Drag items or use arrow keys to reorder'}
         </div>
       </div>
     </QuestionWrapper>

@@ -1,12 +1,12 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { ConditionalLogicEngine } from '../../utils/conditionalLogic';
 import type { AnyQuestion, QuestionResponse } from '../../types';
-import { 
+import {
   createMockShortAnswerQuestion,
   createMockNumericQuestion,
   createMockMultipleChoiceQuestion,
   createMockTrueFalseQuestion,
-  createMockResponse
+  createMockResponse,
 } from '../test-utils';
 
 describe('ConditionalLogicEngine', () => {
@@ -19,7 +19,7 @@ describe('ConditionalLogicEngine', () => {
       createMockShortAnswerQuestion({ id: 'q1', text: 'Name' }),
       createMockNumericQuestion({ id: 'q2', text: 'Age' }),
       createMockMultipleChoiceQuestion({ id: 'q3', text: 'Skills', multiple: true }),
-      createMockTrueFalseQuestion({ id: 'q4', text: 'Remote?' })
+      createMockTrueFalseQuestion({ id: 'q4', text: 'Remote?' }),
     ];
     responses = {};
     engine = new ConditionalLogicEngine(questions, responses);
@@ -29,26 +29,28 @@ describe('ConditionalLogicEngine', () => {
     it('evaluates equals condition correctly', () => {
       const question = createMockShortAnswerQuestion({
         id: 'q5',
-        conditions: [{
-          questionId: 'q1',
-          operator: 'equals',
-          value: 'John',
-          action: 'show'
-        }]
+        conditions: [
+          {
+            questionId: 'q1',
+            operator: 'equals',
+            value: 'John',
+            action: 'show',
+          },
+        ],
       });
       questions.push(question);
-      
+
       // Without response, should be hidden
       engine = new ConditionalLogicEngine(questions, responses);
       let state = engine.getQuestionState('q5');
       expect(state.visible).toBe(false);
-      
+
       // With matching response, should be visible
       responses['q1'] = createMockResponse('q1', 'John');
       engine = new ConditionalLogicEngine(questions, responses);
       state = engine.getQuestionState('q5');
       expect(state.visible).toBe(true);
-      
+
       // With non-matching response, should be hidden
       responses['q1'] = createMockResponse('q1', 'Jane');
       engine = new ConditionalLogicEngine(questions, responses);
@@ -59,16 +61,18 @@ describe('ConditionalLogicEngine', () => {
     it('evaluates not-equals condition correctly', () => {
       const question = createMockShortAnswerQuestion({
         id: 'q5',
-        conditions: [{
-          questionId: 'q1',
-          operator: 'not-equals',
-          value: 'John',
-          action: 'show'
-        }]
+        conditions: [
+          {
+            questionId: 'q1',
+            operator: 'not-equals',
+            value: 'John',
+            action: 'show',
+          },
+        ],
       });
       questions.push(question);
       responses['q1'] = createMockResponse('q1', 'Jane');
-      
+
       engine = new ConditionalLogicEngine(questions, responses);
       const state = engine.getQuestionState('q5');
       expect(state.visible).toBe(true);
@@ -77,16 +81,18 @@ describe('ConditionalLogicEngine', () => {
     it('evaluates contains condition for strings', () => {
       const question = createMockShortAnswerQuestion({
         id: 'q5',
-        conditions: [{
-          questionId: 'q1',
-          operator: 'contains',
-          value: 'oh',
-          action: 'show'
-        }]
+        conditions: [
+          {
+            questionId: 'q1',
+            operator: 'contains',
+            value: 'oh',
+            action: 'show',
+          },
+        ],
       });
       questions.push(question);
       responses['q1'] = createMockResponse('q1', 'John Doe');
-      
+
       engine = new ConditionalLogicEngine(questions, responses);
       const state = engine.getQuestionState('q5');
       expect(state.visible).toBe(true);
@@ -95,16 +101,18 @@ describe('ConditionalLogicEngine', () => {
     it('evaluates contains condition for arrays', () => {
       const question = createMockShortAnswerQuestion({
         id: 'q5',
-        conditions: [{
-          questionId: 'q3',
-          operator: 'contains',
-          value: 'js',
-          action: 'show'
-        }]
+        conditions: [
+          {
+            questionId: 'q3',
+            operator: 'contains',
+            value: 'js',
+            action: 'show',
+          },
+        ],
       });
       questions.push(question);
       responses['q3'] = createMockResponse('q3', ['js', 'ts', 'python']);
-      
+
       engine = new ConditionalLogicEngine(questions, responses);
       const state = engine.getQuestionState('q5');
       expect(state.visible).toBe(true);
@@ -113,20 +121,22 @@ describe('ConditionalLogicEngine', () => {
     it('evaluates greater-than condition', () => {
       const question = createMockShortAnswerQuestion({
         id: 'q5',
-        conditions: [{
-          questionId: 'q2',
-          operator: 'greater-than',
-          value: 18,
-          action: 'show'
-        }]
+        conditions: [
+          {
+            questionId: 'q2',
+            operator: 'greater-than',
+            value: 18,
+            action: 'show',
+          },
+        ],
       });
       questions.push(question);
       responses['q2'] = createMockResponse('q2', 25);
-      
+
       engine = new ConditionalLogicEngine(questions, responses);
       const state = engine.getQuestionState('q5');
       expect(state.visible).toBe(true);
-      
+
       responses['q2'] = createMockResponse('q2', 15);
       engine = new ConditionalLogicEngine(questions, responses);
       const state2 = engine.getQuestionState('q5');
@@ -136,16 +146,18 @@ describe('ConditionalLogicEngine', () => {
     it('evaluates less-than condition', () => {
       const question = createMockShortAnswerQuestion({
         id: 'q5',
-        conditions: [{
-          questionId: 'q2',
-          operator: 'less-than',
-          value: 65,
-          action: 'show'
-        }]
+        conditions: [
+          {
+            questionId: 'q2',
+            operator: 'less-than',
+            value: 65,
+            action: 'show',
+          },
+        ],
       });
       questions.push(question);
       responses['q2'] = createMockResponse('q2', 30);
-      
+
       engine = new ConditionalLogicEngine(questions, responses);
       const state = engine.getQuestionState('q5');
       expect(state.visible).toBe(true);
@@ -154,16 +166,18 @@ describe('ConditionalLogicEngine', () => {
     it('evaluates in condition', () => {
       const question = createMockShortAnswerQuestion({
         id: 'q5',
-        conditions: [{
-          questionId: 'q1',
-          operator: 'in',
-          value: ['John', 'Jane', 'Bob'],
-          action: 'show'
-        }]
+        conditions: [
+          {
+            questionId: 'q1',
+            operator: 'in',
+            value: ['John', 'Jane', 'Bob'],
+            action: 'show',
+          },
+        ],
       });
       questions.push(question);
       responses['q1'] = createMockResponse('q1', 'Jane');
-      
+
       engine = new ConditionalLogicEngine(questions, responses);
       const state = engine.getQuestionState('q5');
       expect(state.visible).toBe(true);
@@ -172,33 +186,41 @@ describe('ConditionalLogicEngine', () => {
     it('evaluates is-empty condition', () => {
       const question = createMockShortAnswerQuestion({
         id: 'q5',
-        conditions: [{
-          questionId: 'q1',
-          operator: 'is-empty',
-          action: 'show'
-        }]
+        conditions: [
+          {
+            questionId: 'q1',
+            operator: 'is-empty',
+            action: 'show',
+          },
+        ],
       });
       questions.push(question);
-      
+
       // Empty string
       responses['q1'] = createMockResponse('q1', '');
       engine = new ConditionalLogicEngine(questions, responses);
       expect(engine.getQuestionState('q5').visible).toBe(true);
-      
+
       // Whitespace only
       responses['q1'] = createMockResponse('q1', '   ');
       engine = new ConditionalLogicEngine(questions, responses);
       expect(engine.getQuestionState('q5').visible).toBe(true);
-      
+
       // Empty array
       responses['q3'] = createMockResponse('q3', []);
       engine = new ConditionalLogicEngine(questions, responses);
       const firstCondition = question.conditions![0];
-      const question2 = { ...question, id: 'q6', conditions: [{ 
-        questionId: 'q3',
-        operator: firstCondition?.operator || 'equals',
-        action: firstCondition?.action || 'show'
-      }] };
+      const question2 = {
+        ...question,
+        id: 'q6',
+        conditions: [
+          {
+            questionId: 'q3',
+            operator: firstCondition?.operator || 'equals',
+            action: firstCondition?.action || 'show',
+          },
+        ],
+      };
       questions.push(question2);
       engine = new ConditionalLogicEngine(questions, responses);
       expect(engine.getQuestionState('q6').visible).toBe(true);
@@ -207,15 +229,17 @@ describe('ConditionalLogicEngine', () => {
     it('evaluates is-not-empty condition', () => {
       const question = createMockShortAnswerQuestion({
         id: 'q5',
-        conditions: [{
-          questionId: 'q1',
-          operator: 'is-not-empty',
-          action: 'show'
-        }]
+        conditions: [
+          {
+            questionId: 'q1',
+            operator: 'is-not-empty',
+            action: 'show',
+          },
+        ],
       });
       questions.push(question);
       responses['q1'] = createMockResponse('q1', 'John');
-      
+
       engine = new ConditionalLogicEngine(questions, responses);
       const state = engine.getQuestionState('q5');
       expect(state.visible).toBe(true);
@@ -226,18 +250,20 @@ describe('ConditionalLogicEngine', () => {
     it('handles show action', () => {
       const question = createMockShortAnswerQuestion({
         id: 'q5',
-        conditions: [{
-          questionId: 'q4',
-          operator: 'equals',
-          value: true,
-          action: 'show'
-        }]
+        conditions: [
+          {
+            questionId: 'q4',
+            operator: 'equals',
+            value: true,
+            action: 'show',
+          },
+        ],
       });
       questions.push(question);
-      
+
       engine = new ConditionalLogicEngine(questions, responses);
       expect(engine.getQuestionState('q5').visible).toBe(false);
-      
+
       responses['q4'] = createMockResponse('q4', true);
       engine = new ConditionalLogicEngine(questions, responses);
       expect(engine.getQuestionState('q5').visible).toBe(true);
@@ -246,18 +272,20 @@ describe('ConditionalLogicEngine', () => {
     it('handles hide action', () => {
       const question = createMockShortAnswerQuestion({
         id: 'q5',
-        conditions: [{
-          questionId: 'q4',
-          operator: 'equals',
-          value: false,
-          action: 'hide'
-        }]
+        conditions: [
+          {
+            questionId: 'q4',
+            operator: 'equals',
+            value: false,
+            action: 'hide',
+          },
+        ],
       });
       questions.push(question);
-      
+
       engine = new ConditionalLogicEngine(questions, responses);
       expect(engine.getQuestionState('q5').visible).toBe(true);
-      
+
       responses['q4'] = createMockResponse('q4', false);
       engine = new ConditionalLogicEngine(questions, responses);
       expect(engine.getQuestionState('q5').visible).toBe(false);
@@ -267,18 +295,20 @@ describe('ConditionalLogicEngine', () => {
       const question = createMockShortAnswerQuestion({
         id: 'q5',
         required: false,
-        conditions: [{
-          questionId: 'q4',
-          operator: 'equals',
-          value: true,
-          action: 'require'
-        }]
+        conditions: [
+          {
+            questionId: 'q4',
+            operator: 'equals',
+            value: true,
+            action: 'require',
+          },
+        ],
       });
       questions.push(question);
-      
+
       engine = new ConditionalLogicEngine(questions, responses);
       expect(engine.getQuestionState('q5').required).toBe(false);
-      
+
       responses['q4'] = createMockResponse('q4', true);
       engine = new ConditionalLogicEngine(questions, responses);
       expect(engine.getQuestionState('q5').required).toBe(true);
@@ -287,18 +317,20 @@ describe('ConditionalLogicEngine', () => {
     it('handles disable action', () => {
       const question = createMockShortAnswerQuestion({
         id: 'q5',
-        conditions: [{
-          questionId: 'q4',
-          operator: 'equals',
-          value: false,
-          action: 'disable'
-        }]
+        conditions: [
+          {
+            questionId: 'q4',
+            operator: 'equals',
+            value: false,
+            action: 'disable',
+          },
+        ],
       });
       questions.push(question);
-      
+
       engine = new ConditionalLogicEngine(questions, responses);
       expect(engine.getQuestionState('q5').disabled).toBe(false);
-      
+
       responses['q4'] = createMockResponse('q4', false);
       engine = new ConditionalLogicEngine(questions, responses);
       expect(engine.getQuestionState('q5').disabled).toBe(true);
@@ -307,19 +339,21 @@ describe('ConditionalLogicEngine', () => {
     it('handles enable action', () => {
       const question = createMockShortAnswerQuestion({
         id: 'q5',
-        conditions: [{
-          questionId: 'q4',
-          operator: 'equals',
-          value: true,
-          action: 'enable'
-        }]
+        conditions: [
+          {
+            questionId: 'q4',
+            operator: 'equals',
+            value: true,
+            action: 'enable',
+          },
+        ],
       });
       questions.push(question);
-      
+
       // Should be disabled when condition is not met
       engine = new ConditionalLogicEngine(questions, responses);
       expect(engine.getQuestionState('q5').disabled).toBe(true);
-      
+
       // Should be enabled when condition is met
       responses['q4'] = createMockResponse('q4', true);
       engine = new ConditionalLogicEngine(questions, responses);
@@ -336,31 +370,31 @@ describe('ConditionalLogicEngine', () => {
             questionId: 'q2',
             operator: 'greater-than',
             value: 18,
-            action: 'show'
+            action: 'show',
           },
           {
             questionId: 'q4',
             operator: 'equals',
             value: true,
-            action: 'require'
-          }
-        ]
+            action: 'require',
+          },
+        ],
       });
       questions.push(question);
-      
+
       // Question hidden, not required
       engine = new ConditionalLogicEngine(questions, responses);
       let state = engine.getQuestionState('q5');
       expect(state.visible).toBe(false);
       expect(state.required).toBe(false);
-      
+
       // Question visible, not required
       responses['q2'] = createMockResponse('q2', 25);
       engine = new ConditionalLogicEngine(questions, responses);
       state = engine.getQuestionState('q5');
       expect(state.visible).toBe(true);
       expect(state.required).toBe(false);
-      
+
       // Question visible and required
       responses['q4'] = createMockResponse('q4', true);
       engine = new ConditionalLogicEngine(questions, responses);
@@ -374,26 +408,30 @@ describe('ConditionalLogicEngine', () => {
     it('identifies dependent questions', () => {
       const q5 = createMockShortAnswerQuestion({
         id: 'q5',
-        conditions: [{
-          questionId: 'q1',
-          operator: 'equals',
-          value: 'John',
-          action: 'show'
-        }]
+        conditions: [
+          {
+            questionId: 'q1',
+            operator: 'equals',
+            value: 'John',
+            action: 'show',
+          },
+        ],
       });
-      
+
       const q6 = createMockShortAnswerQuestion({
         id: 'q6',
-        conditions: [{
-          questionId: 'q5',
-          operator: 'is-not-empty',
-          action: 'show'
-        }]
+        conditions: [
+          {
+            questionId: 'q5',
+            operator: 'is-not-empty',
+            action: 'show',
+          },
+        ],
       });
-      
+
       questions.push(q5, q6);
       engine = new ConditionalLogicEngine(questions, responses);
-      
+
       const dependents = engine.getDependentQuestions('q1');
       expect(dependents.has('q5')).toBe(true);
       expect(dependents.has('q6')).toBe(true); // Transitive dependency
@@ -402,19 +440,21 @@ describe('ConditionalLogicEngine', () => {
     it('clears cache when response updates', () => {
       const question = createMockShortAnswerQuestion({
         id: 'q5',
-        conditions: [{
-          questionId: 'q2',
-          operator: 'greater-than',
-          value: 18,
-          action: 'show'
-        }]
+        conditions: [
+          {
+            questionId: 'q2',
+            operator: 'greater-than',
+            value: 18,
+            action: 'show',
+          },
+        ],
       });
       questions.push(question);
       responses['q2'] = createMockResponse('q2', 15);
-      
+
       engine = new ConditionalLogicEngine(questions, responses);
       expect(engine.getQuestionState('q5').visible).toBe(false);
-      
+
       // Update response
       engine.updateResponse('q2', createMockResponse('q2', 25));
       expect(engine.getQuestionState('q5').visible).toBe(true);
@@ -424,53 +464,59 @@ describe('ConditionalLogicEngine', () => {
       // q5 depends on q1, q6 depends on q5, q7 depends on q6
       const q5 = createMockShortAnswerQuestion({
         id: 'q5',
-        conditions: [{
-          questionId: 'q1',
-          operator: 'equals',
-          value: 'trigger',
-          action: 'show'
-        }]
+        conditions: [
+          {
+            questionId: 'q1',
+            operator: 'equals',
+            value: 'trigger',
+            action: 'show',
+          },
+        ],
       });
-      
+
       const q6 = createMockShortAnswerQuestion({
         id: 'q6',
-        conditions: [{
-          questionId: 'q5',
-          operator: 'is-not-empty',
-          action: 'show'
-        }]
+        conditions: [
+          {
+            questionId: 'q5',
+            operator: 'is-not-empty',
+            action: 'show',
+          },
+        ],
       });
-      
+
       const q7 = createMockShortAnswerQuestion({
         id: 'q7',
-        conditions: [{
-          questionId: 'q6',
-          operator: 'is-not-empty',
-          action: 'show'
-        }]
+        conditions: [
+          {
+            questionId: 'q6',
+            operator: 'is-not-empty',
+            action: 'show',
+          },
+        ],
       });
-      
+
       questions.push(q5, q6, q7);
-      
+
       // Initially all hidden
       engine = new ConditionalLogicEngine(questions, responses);
       expect(engine.getQuestionState('q5').visible).toBe(false);
       expect(engine.getQuestionState('q6').visible).toBe(false);
       expect(engine.getQuestionState('q7').visible).toBe(false);
-      
+
       // Trigger first condition
       responses['q1'] = createMockResponse('q1', 'trigger');
       engine = new ConditionalLogicEngine(questions, responses);
       expect(engine.getQuestionState('q5').visible).toBe(true);
       expect(engine.getQuestionState('q6').visible).toBe(false);
       expect(engine.getQuestionState('q7').visible).toBe(false);
-      
+
       // Trigger second condition
       responses['q5'] = createMockResponse('q5', 'value');
       engine = new ConditionalLogicEngine(questions, responses);
       expect(engine.getQuestionState('q6').visible).toBe(true);
       expect(engine.getQuestionState('q7').visible).toBe(false);
-      
+
       // Trigger third condition
       responses['q6'] = createMockResponse('q6', 'value');
       engine = new ConditionalLogicEngine(questions, responses);
@@ -482,31 +528,35 @@ describe('ConditionalLogicEngine', () => {
     it('gets all visible questions', () => {
       const q5 = createMockShortAnswerQuestion({
         id: 'q5',
-        conditions: [{
-          questionId: 'q2',
-          operator: 'greater-than',
-          value: 18,
-          action: 'show'
-        }]
+        conditions: [
+          {
+            questionId: 'q2',
+            operator: 'greater-than',
+            value: 18,
+            action: 'show',
+          },
+        ],
       });
-      
+
       const q6 = createMockShortAnswerQuestion({
         id: 'q6',
-        conditions: [{
-          questionId: 'q4',
-          operator: 'equals',
-          value: true,
-          action: 'hide'
-        }]
+        conditions: [
+          {
+            questionId: 'q4',
+            operator: 'equals',
+            value: true,
+            action: 'hide',
+          },
+        ],
       });
-      
+
       questions.push(q5, q6);
       responses['q2'] = createMockResponse('q2', 25);
       responses['q4'] = createMockResponse('q4', false);
-      
+
       engine = new ConditionalLogicEngine(questions, responses);
       const visible = engine.getVisibleQuestions();
-      
+
       expect(visible.has('q1')).toBe(true); // No conditions
       expect(visible.has('q2')).toBe(true); // No conditions
       expect(visible.has('q3')).toBe(true); // No conditions
@@ -524,25 +574,25 @@ describe('ConditionalLogicEngine', () => {
             questionId: 'q1',
             operator: 'equals',
             value: 'John',
-            action: 'show'
+            action: 'show',
           },
           {
             questionId: 'q2',
             operator: 'greater-than',
             value: 18,
-            action: 'require'
-          }
-        ]
+            action: 'require',
+          },
+        ],
       });
       if (questions[0]) questions[0].text = 'Name';
       if (questions[1]) questions[1].text = 'Age';
       questions.push(question);
       responses['q1'] = createMockResponse('q1', 'Jane');
       responses['q2'] = createMockResponse('q2', 25);
-      
+
       engine = new ConditionalLogicEngine(questions, responses);
       const path = engine.getEvaluationPath('q5');
-      
+
       expect(path).toHaveLength(2);
       expect(path[0]).toContain('Name equals John → show (NOT MET)');
       expect(path[1]).toContain('Age greater-than 18 → require (MET)');

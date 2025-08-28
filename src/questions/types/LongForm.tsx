@@ -10,7 +10,7 @@ export const LongForm: React.FC<QuestionComponentProps<string>> = ({
   disabled = false,
   readOnly = false,
   error,
-  className = ''
+  className = '',
 }) => {
   const q = question as LongFormQuestion;
   const [localValue, setLocalValue] = useState(value);
@@ -27,7 +27,10 @@ export const LongForm: React.FC<QuestionComponentProps<string>> = ({
   }, [localValue]);
 
   const updateWordCount = (text: string) => {
-    const words = text.trim().split(/\s+/).filter(word => word.length > 0);
+    const words = text
+      .trim()
+      .split(/\s+/)
+      .filter((word) => word.length > 0);
     setWordCount(words.length);
   };
 
@@ -40,9 +43,9 @@ export const LongForm: React.FC<QuestionComponentProps<string>> = ({
 
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const newValue = e.target.value;
-    
+
     if (q.maxLength && newValue.length > q.maxLength) return;
-    
+
     setLocalValue(newValue);
     updateWordCount(newValue);
     onChange(newValue);
@@ -68,15 +71,16 @@ export const LongForm: React.FC<QuestionComponentProps<string>> = ({
 
   const insertMarkdown = (prefix: string, suffix: string = '') => {
     if (!textAreaRef.current) return;
-    
+
     const start = textAreaRef.current.selectionStart;
     const end = textAreaRef.current.selectionEnd;
     const selectedText = localValue.substring(start, end);
-    const newText = localValue.substring(0, start) + prefix + selectedText + suffix + localValue.substring(end);
-    
+    const newText =
+      localValue.substring(0, start) + prefix + selectedText + suffix + localValue.substring(end);
+
     setLocalValue(newText);
     onChange(newText);
-    
+
     setTimeout(() => {
       if (textAreaRef.current) {
         textAreaRef.current.focus();
@@ -168,7 +172,9 @@ export const LongForm: React.FC<QuestionComponentProps<string>> = ({
         <div className="flex justify-between text-xs text-gray-500">
           <span>{wordCount} words</span>
           {q.maxLength && (
-            <span>{localValue.length}/{q.maxLength} characters</span>
+            <span>
+              {localValue.length}/{q.maxLength} characters
+            </span>
           )}
         </div>
       </div>

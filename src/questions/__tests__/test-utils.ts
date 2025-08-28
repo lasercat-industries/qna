@@ -1,25 +1,29 @@
 /**
  * Test utilities for Vitest tests
  */
-import type { 
+import type {
   ShortAnswerQuestion,
   NumericQuestion,
   MultipleChoiceQuestion,
   TrueFalseQuestion,
-  QuestionResponse 
+  QuestionResponse,
 } from '../types';
 
-export const createMockShortAnswerQuestion = (overrides?: Partial<ShortAnswerQuestion>): ShortAnswerQuestion => ({
+export const createMockShortAnswerQuestion = (
+  overrides?: Partial<ShortAnswerQuestion>,
+): ShortAnswerQuestion => ({
   id: 'short-1',
   type: 'short-answer',
   text: 'What is your name?',
   required: false,
   priority: 'medium',
   tags: ['personal'],
-  ...overrides
+  ...overrides,
 });
 
-export const createMockNumericQuestion = (overrides?: Partial<NumericQuestion>): NumericQuestion => ({
+export const createMockNumericQuestion = (
+  overrides?: Partial<NumericQuestion>,
+): NumericQuestion => ({
   id: 'num-1',
   type: 'numeric',
   text: 'Enter a number',
@@ -29,10 +33,12 @@ export const createMockNumericQuestion = (overrides?: Partial<NumericQuestion>):
   min: 0,
   max: 100,
   step: 1,
-  ...overrides
+  ...overrides,
 });
 
-export const createMockMultipleChoiceQuestion = (overrides?: Partial<MultipleChoiceQuestion>): MultipleChoiceQuestion => ({
+export const createMockMultipleChoiceQuestion = (
+  overrides?: Partial<MultipleChoiceQuestion>,
+): MultipleChoiceQuestion => ({
   id: 'mc-1',
   type: 'multiple-choice',
   text: 'Select your option',
@@ -41,31 +47,33 @@ export const createMockMultipleChoiceQuestion = (overrides?: Partial<MultipleCho
   tags: [],
   options: [
     { id: 'opt1', label: 'Option 1' },
-    { id: 'opt2', label: 'Option 2' }
+    { id: 'opt2', label: 'Option 2' },
   ],
   multiple: false,
   showOther: false,
-  ...overrides
+  ...overrides,
 });
 
-export const createMockTrueFalseQuestion = (overrides?: Partial<TrueFalseQuestion>): TrueFalseQuestion => ({
+export const createMockTrueFalseQuestion = (
+  overrides?: Partial<TrueFalseQuestion>,
+): TrueFalseQuestion => ({
   id: 'tf-1',
   type: 'true-false',
   text: 'Is this true?',
   required: false,
   priority: 'medium',
   tags: [],
-  ...overrides
+  ...overrides,
 });
 
 export const createMockResponse = (
   questionId: string,
   value: unknown,
-  valid = true
+  valid = true,
 ): QuestionResponse => ({
   questionId,
   value,
   timestamp: new Date(),
   valid,
-  errors: []
+  errors: [],
 });

@@ -10,7 +10,7 @@ export const NumericAnswer: React.FC<QuestionComponentProps<number>> = ({
   disabled = false,
   readOnly = false,
   error,
-  className = ''
+  className = '',
 }) => {
   const q = question as NumericQuestion;
   const [localValue, setLocalValue] = useState<string>(value?.toString() || '');
@@ -23,7 +23,7 @@ export const NumericAnswer: React.FC<QuestionComponentProps<number>> = ({
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const inputValue = e.target.value;
-    
+
     // Allow empty string for clearing
     if (inputValue === '') {
       setLocalValue('');
@@ -32,10 +32,8 @@ export const NumericAnswer: React.FC<QuestionComponentProps<number>> = ({
     }
 
     // Validate numeric input
-    const regex = q.precision !== undefined && q.precision > 0
-      ? /^-?\d*\.?\d*$/
-      : /^-?\d*$/;
-    
+    const regex = q.precision !== undefined && q.precision > 0 ? /^-?\d*\.?\d*$/ : /^-?\d*$/;
+
     if (!regex.test(inputValue)) return;
 
     // Check decimal places
@@ -45,7 +43,7 @@ export const NumericAnswer: React.FC<QuestionComponentProps<number>> = ({
     }
 
     setLocalValue(inputValue);
-    
+
     const numValue = parseFloat(inputValue);
     if (!isNaN(numValue)) {
       // Apply min/max constraints
@@ -56,23 +54,23 @@ export const NumericAnswer: React.FC<QuestionComponentProps<number>> = ({
       if (q.max !== undefined && numValue > q.max) {
         constrainedValue = q.max;
       }
-      
+
       onChange(constrainedValue);
     }
   };
 
   const handleBlur = () => {
     setIsFocused(false);
-    
+
     // Format on blur
     const numValue = parseFloat(localValue);
     if (!isNaN(numValue)) {
       let formatted = numValue.toString();
-      
+
       if (q.precision !== undefined && q.precision >= 0) {
         formatted = numValue.toFixed(q.precision);
       }
-      
+
       setLocalValue(formatted);
     } else if (localValue === '') {
       setLocalValue('0');
@@ -88,9 +86,10 @@ export const NumericAnswer: React.FC<QuestionComponentProps<number>> = ({
     const current = parseFloat(localValue) || 0;
     const step = q.step || 1;
     const newValue = current + step;
-    
+
     if (q.max === undefined || newValue <= q.max) {
-      const formatted = q.precision !== undefined ? newValue.toFixed(q.precision) : newValue.toString();
+      const formatted =
+        q.precision !== undefined ? newValue.toFixed(q.precision) : newValue.toString();
       setLocalValue(formatted);
       onChange(newValue);
     }
@@ -100,9 +99,10 @@ export const NumericAnswer: React.FC<QuestionComponentProps<number>> = ({
     const current = parseFloat(localValue) || 0;
     const step = q.step || 1;
     const newValue = current - step;
-    
+
     if (q.min === undefined || newValue >= q.min) {
-      const formatted = q.precision !== undefined ? newValue.toFixed(q.precision) : newValue.toString();
+      const formatted =
+        q.precision !== undefined ? newValue.toFixed(q.precision) : newValue.toString();
       setLocalValue(formatted);
       onChange(newValue);
     }
@@ -156,11 +156,9 @@ export const NumericAnswer: React.FC<QuestionComponentProps<number>> = ({
             onChange={handleChange}
             onFocus={handleFocus}
           />
-          
+
           {(q.unit || displayAsPercentage) && (
-            <div 
-              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm pointer-events-none"
-            >
+            <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm pointer-events-none">
               {displayAsPercentage && !isFocused ? '' : q.unit}
             </div>
           )}
@@ -174,12 +172,17 @@ export const NumericAnswer: React.FC<QuestionComponentProps<number>> = ({
               hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500
               ${disabled || readOnly ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
             `}
-            disabled={disabled || readOnly || (q.max !== undefined && parseFloat(localValue) >= q.max)}
+            disabled={
+              disabled || readOnly || (q.max !== undefined && parseFloat(localValue) >= q.max)
+            }
             type="button"
             onClick={handleIncrement}
           >
             <svg className="w-3 h-3 mx-auto" fill="currentColor" viewBox="0 0 20 20">
-              <path d="M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z" fillRule="evenodd" />
+              <path
+                d="M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z"
+                fillRule="evenodd"
+              />
             </svg>
           </button>
           <button
@@ -189,12 +192,17 @@ export const NumericAnswer: React.FC<QuestionComponentProps<number>> = ({
               hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500
               ${disabled || readOnly ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
             `}
-            disabled={disabled || readOnly || (q.min !== undefined && parseFloat(localValue) <= q.min)}
+            disabled={
+              disabled || readOnly || (q.min !== undefined && parseFloat(localValue) <= q.min)
+            }
             type="button"
             onClick={handleDecrement}
           >
             <svg className="w-3 h-3 mx-auto" fill="currentColor" viewBox="0 0 20 20">
-              <path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" fillRule="evenodd" />
+              <path
+                d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+                fillRule="evenodd"
+              />
             </svg>
           </button>
         </div>
@@ -224,11 +232,7 @@ export const NumericAnswer: React.FC<QuestionComponentProps<number>> = ({
         </div>
       )}
 
-      {q.step && (
-        <div className="text-xs text-gray-500 mt-1">
-          Step: {q.step}
-        </div>
-      )}
+      {q.step && <div className="text-xs text-gray-500 mt-1">Step: {q.step}</div>}
     </QuestionWrapper>
   );
 };

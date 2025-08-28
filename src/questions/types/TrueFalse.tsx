@@ -10,7 +10,7 @@ export const TrueFalse: React.FC<QuestionComponentProps<boolean>> = ({
   disabled = false,
   readOnly = false,
   error,
-  className = ''
+  className = '',
 }) => {
   const q = question as TrueFalseQuestion;
   const [localValue, setLocalValue] = useState(value);
@@ -45,9 +45,11 @@ export const TrueFalse: React.FC<QuestionComponentProps<boolean>> = ({
           className={`
             flex-1 px-4 py-3 rounded-lg border-2 font-medium
             transition-all duration-200
-            ${localValue === true 
-              ? 'bg-green-50 border-green-500 text-green-700' 
-              : 'bg-white border-gray-300 text-gray-700 hover:border-gray-400'}
+            ${
+              localValue === true
+                ? 'bg-green-50 border-green-500 text-green-700'
+                : 'bg-white border-gray-300 text-gray-700 hover:border-gray-400'
+            }
             ${disabled || readOnly ? 'opacity-60 cursor-not-allowed' : 'cursor-pointer'}
           `}
           disabled={disabled || readOnly}
@@ -64,9 +66,11 @@ export const TrueFalse: React.FC<QuestionComponentProps<boolean>> = ({
           className={`
             flex-1 px-4 py-3 rounded-lg border-2 font-medium
             transition-all duration-200
-            ${localValue === false 
-              ? 'bg-red-50 border-red-500 text-red-700' 
-              : 'bg-white border-gray-300 text-gray-700 hover:border-gray-400'}
+            ${
+              localValue === false
+                ? 'bg-red-50 border-red-500 text-red-700'
+                : 'bg-white border-gray-300 text-gray-700 hover:border-gray-400'
+            }
             ${disabled || readOnly ? 'opacity-60 cursor-not-allowed' : 'cursor-pointer'}
           `}
           disabled={disabled || readOnly}

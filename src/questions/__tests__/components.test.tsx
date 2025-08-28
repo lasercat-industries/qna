@@ -10,11 +10,11 @@ import { QuestionWrapper } from '../core/QuestionWrapper';
 import { QuestionGroup } from '../core/QuestionGroup';
 import { QuestionRenderer } from '../core/QuestionRenderer';
 import { ConditionalLogicEngine } from '../utils/conditionalLogic';
-import type { 
-  ShortAnswerQuestion, 
+import type {
+  ShortAnswerQuestion,
   MultipleChoiceQuestion,
   SliderQuestion,
-  AnyQuestion 
+  AnyQuestion,
 } from '../types';
 
 describe('Component Exports', () => {
@@ -51,7 +51,7 @@ describe('Question Types', () => {
       placeholder: 'Enter name',
       maxLength: 100,
       pattern: '^[A-Za-z ]+$',
-      suggestions: ['John', 'Jane']
+      suggestions: ['John', 'Jane'],
     };
 
     expect(question.type).toBe('short-answer');
@@ -70,11 +70,11 @@ describe('Question Types', () => {
       options: [
         { id: 'js', label: 'JavaScript' },
         { id: 'ts', label: 'TypeScript' },
-        { id: 'py', label: 'Python' }
+        { id: 'py', label: 'Python' },
       ],
       multiple: true,
       showOther: true,
-      otherLabel: 'Other skill'
+      otherLabel: 'Other skill',
     };
 
     expect(question.type).toBe('multiple-choice');
@@ -96,7 +96,7 @@ describe('Question Types', () => {
       step: 1,
       dual: false,
       showValue: true,
-      unit: ' years'
+      unit: ' years',
     };
 
     expect(question.type).toBe('slider');
@@ -115,8 +115,8 @@ describe('ConditionalLogicEngine', () => {
         text: 'Name',
         required: true,
         priority: 'high',
-        tags: []
-      }
+        tags: [],
+      },
     ];
 
     const engine = new ConditionalLogicEngine(questions, {});
@@ -132,7 +132,7 @@ describe('ConditionalLogicEngine', () => {
         text: 'Are you employed?',
         required: true,
         priority: 'high',
-        tags: []
+        tags: [],
       },
       {
         id: 'q2',
@@ -141,29 +141,31 @@ describe('ConditionalLogicEngine', () => {
         required: false,
         priority: 'medium',
         tags: [],
-        conditions: [{
-          questionId: 'q1',
-          operator: 'equals',
-          value: true,
-          action: 'show'
-        }]
-      }
+        conditions: [
+          {
+            questionId: 'q1',
+            operator: 'equals',
+            value: true,
+            action: 'show',
+          },
+        ],
+      },
     ];
 
     const engine = new ConditionalLogicEngine(questions, {});
-    
+
     // Initially, q2 should be hidden
     expect(engine.getVisibleQuestions().has('q2')).toBe(false);
-    
+
     // After setting q1 to true, q2 should be visible
     engine.updateResponse('q1', {
       questionId: 'q1',
       value: true,
       timestamp: new Date(),
       valid: true,
-      errors: []
+      errors: [],
     });
-    
+
     expect(engine.getVisibleQuestions().has('q2')).toBe(true);
   });
 
@@ -177,7 +179,7 @@ describe('ConditionalLogicEngine', () => {
         priority: 'high',
         tags: [],
         min: 0,
-        max: 120
+        max: 120,
       },
       {
         id: 'senior',
@@ -186,37 +188,39 @@ describe('ConditionalLogicEngine', () => {
         required: false,
         priority: 'low',
         tags: [],
-        conditions: [{
-          questionId: 'age',
-          operator: 'greater-than-or-equal',
-          value: 65,
-          action: 'show'
-        }]
-      }
+        conditions: [
+          {
+            questionId: 'age',
+            operator: 'greater-than-or-equal',
+            value: 65,
+            action: 'show',
+          },
+        ],
+      },
     ];
 
     const engine = new ConditionalLogicEngine(questions, {});
-    
+
     // Initially hidden
     expect(engine.getVisibleQuestions().has('senior')).toBe(false);
-    
+
     // Still hidden at 64
     engine.updateResponse('age', {
       questionId: 'age',
       value: 64,
       timestamp: new Date(),
       valid: true,
-      errors: []
+      errors: [],
     });
     expect(engine.getVisibleQuestions().has('senior')).toBe(false);
-    
+
     // Visible at 65
     engine.updateResponse('age', {
       questionId: 'age',
       value: 65,
       timestamp: new Date(),
       valid: true,
-      errors: []
+      errors: [],
     });
     expect(engine.getVisibleQuestions().has('senior')).toBe(true);
   });
@@ -233,10 +237,10 @@ describe('ConditionalLogicEngine', () => {
         options: [
           { id: 'react', label: 'React' },
           { id: 'vue', label: 'Vue' },
-          { id: 'angular', label: 'Angular' }
+          { id: 'angular', label: 'Angular' },
         ],
         multiple: true,
-        showOther: false
+        showOther: false,
       },
       {
         id: 'react-version',
@@ -245,37 +249,39 @@ describe('ConditionalLogicEngine', () => {
         required: false,
         priority: 'low',
         tags: [],
-        conditions: [{
-          questionId: 'skills',
-          operator: 'contains',
-          value: 'react',
-          action: 'show'
-        }]
-      }
+        conditions: [
+          {
+            questionId: 'skills',
+            operator: 'contains',
+            value: 'react',
+            action: 'show',
+          },
+        ],
+      },
     ];
 
     const engine = new ConditionalLogicEngine(questions, {});
-    
+
     // Initially hidden
     expect(engine.getVisibleQuestions().has('react-version')).toBe(false);
-    
+
     // Visible when React is selected
     engine.updateResponse('skills', {
       questionId: 'skills',
       value: ['react', 'vue'],
       timestamp: new Date(),
       valid: true,
-      errors: []
+      errors: [],
     });
     expect(engine.getVisibleQuestions().has('react-version')).toBe(true);
-    
+
     // Hidden when React is not selected
     engine.updateResponse('skills', {
       questionId: 'skills',
       value: ['vue', 'angular'],
       timestamp: new Date(),
       valid: true,
-      errors: []
+      errors: [],
     });
     expect(engine.getVisibleQuestions().has('react-version')).toBe(false);
   });
@@ -288,17 +294,17 @@ describe('ConditionalLogicEngine', () => {
         text: 'Question 1',
         required: true,
         priority: 'high',
-        tags: []
-      }
+        tags: [],
+      },
     ];
 
     const engine = new ConditionalLogicEngine(questions, {});
-    
+
     // First call calculates
     const visible1 = engine.getVisibleQuestions();
     // Second call uses cache
     const visible2 = engine.getVisibleQuestions();
-    
+
     expect(visible1).toEqual(visible2);
     expect(visible1.has('q1')).toBe(true);
   });
@@ -311,7 +317,7 @@ describe('ConditionalLogicEngine', () => {
         text: 'Toggle',
         required: true,
         priority: 'high',
-        tags: []
+        tags: [],
       },
       {
         id: 'dependent',
@@ -320,30 +326,32 @@ describe('ConditionalLogicEngine', () => {
         required: false,
         priority: 'low',
         tags: [],
-        conditions: [{
-          questionId: 'toggle',
-          operator: 'equals',
-          value: true,
-          action: 'show'
-        }]
-      }
+        conditions: [
+          {
+            questionId: 'toggle',
+            operator: 'equals',
+            value: true,
+            action: 'show',
+          },
+        ],
+      },
     ];
 
     const engine = new ConditionalLogicEngine(questions, {});
-    
+
     // Get initial state (caches result)
     const visible1 = engine.getVisibleQuestions();
     expect(visible1.has('dependent')).toBe(false);
-    
+
     // Update response (should clear cache)
     engine.updateResponse('toggle', {
       questionId: 'toggle',
       value: true,
       timestamp: new Date(),
       valid: true,
-      errors: []
+      errors: [],
     });
-    
+
     // Get new state (recalculates)
     const visible2 = engine.getVisibleQuestions();
     expect(visible2.has('dependent')).toBe(true);
@@ -358,12 +366,12 @@ describe('Question Validation', () => {
       text: 'Required field',
       required: true,
       priority: 'high',
-      tags: []
+      tags: [],
     };
 
     // Empty value for required field
     expect(question.required).toBe(true);
-    
+
     // Would fail validation if empty
     const emptyValue = '';
     const hasValue = emptyValue.length > 0;
@@ -374,7 +382,7 @@ describe('Question Validation', () => {
     const emailPattern = '^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$';
     const validEmail = 'test@example.com';
     const invalidEmail = 'not-an-email';
-    
+
     const emailRegex = new RegExp(emailPattern);
     expect(emailRegex.test(validEmail)).toBe(true);
     expect(emailRegex.test(invalidEmail)).toBe(false);
@@ -383,9 +391,9 @@ describe('Question Validation', () => {
   test('validates numeric ranges', () => {
     const min = 0;
     const max = 100;
-    
+
     const validateRange = (value: number) => value >= min && value <= max;
-    
+
     expect(validateRange(50)).toBe(true);
     expect(validateRange(0)).toBe(true);
     expect(validateRange(100)).toBe(true);

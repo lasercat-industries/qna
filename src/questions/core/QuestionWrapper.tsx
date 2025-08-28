@@ -15,21 +15,31 @@ interface QuestionWrapperProps<T = unknown> {
 
 const getPriorityColor = (priority: Priority): string => {
   switch (priority) {
-    case 'critical': return 'border-red-500';
-    case 'high': return 'border-orange-500';
-    case 'medium': return 'border-yellow-500';
-    case 'low': return 'border-gray-300';
-    default: return 'border-gray-300';
+    case 'critical':
+      return 'border-red-500';
+    case 'high':
+      return 'border-orange-500';
+    case 'medium':
+      return 'border-yellow-500';
+    case 'low':
+      return 'border-gray-300';
+    default:
+      return 'border-gray-300';
   }
 };
 
 const getPriorityIcon = (priority: Priority): string => {
   switch (priority) {
-    case 'critical': return '🔴';
-    case 'high': return '🟠';
-    case 'medium': return '🟡';
-    case 'low': return '⚪';
-    default: return '';
+    case 'critical':
+      return '🔴';
+    case 'high':
+      return '🟠';
+    case 'medium':
+      return '🟡';
+    case 'low':
+      return '⚪';
+    default:
+      return '';
   }
 };
 
@@ -42,68 +52,75 @@ export function QuestionWrapper<T = unknown>({
   disabled = false,
   readOnly = false,
   error: externalError,
-  className = ''
+  className = '',
 }: QuestionWrapperProps<T>) {
   const [internalError, setInternalError] = useState<string>('');
   const [touched, setTouched] = useState(false);
 
-  const validateValue = useCallback((val: T): string[] => {
-    const errors: string[] = [];
-    
-    if (!question.validation) return errors;
+  const validateValue = useCallback(
+    (val: T): string[] => {
+      const errors: string[] = [];
 
-    for (const rule of question.validation) {
-      switch (rule.type) {
-        case 'required':
-          if (!val || (typeof val === 'string' && !val.trim())) {
-            errors.push(rule.message || 'This field is required');
-          }
-          break;
-        case 'min':
-          if (typeof rule.value === 'number') {
-            if (typeof val === 'number' && val < rule.value) {
-              errors.push(rule.message || `Value must be at least ${rule.value}`);
+      if (!question.validation) return errors;
+
+      for (const rule of question.validation) {
+        switch (rule.type) {
+          case 'required':
+            if (!val || (typeof val === 'string' && !val.trim())) {
+              errors.push(rule.message || 'This field is required');
             }
-            if (typeof val === 'string' && val.length < rule.value) {
-              errors.push(rule.message || `Must be at least ${rule.value} characters`);
+            break;
+          case 'min':
+            if (typeof rule.value === 'number') {
+              if (typeof val === 'number' && val < rule.value) {
+                errors.push(rule.message || `Value must be at least ${rule.value}`);
+              }
+              if (typeof val === 'string' && val.length < rule.value) {
+                errors.push(rule.message || `Must be at least ${rule.value} characters`);
+              }
+              if (Array.isArray(val) && val.length < rule.value) {
+                errors.push(rule.message || `Select at least ${rule.value} items`);
+              }
             }
-            if (Array.isArray(val) && val.length < rule.value) {
-              errors.push(rule.message || `Select at least ${rule.value} items`);
+            break;
+          case 'max':
+            if (typeof rule.value === 'number') {
+              if (typeof val === 'number' && val > rule.value) {
+                errors.push(rule.message || `Value must be at most ${rule.value}`);
+              }
+              if (typeof val === 'string' && val.length > rule.value) {
+                errors.push(rule.message || `Must be at most ${rule.value} characters`);
+              }
+              if (Array.isArray(val) && val.length > rule.value) {
+                errors.push(rule.message || `Select at most ${rule.value} items`);
+              }
             }
-          }
-          break;
-        case 'max':
-          if (typeof rule.value === 'number') {
-            if (typeof val === 'number' && val > rule.value) {
-              errors.push(rule.message || `Value must be at most ${rule.value}`);
+            break;
+          case 'pattern':
+            if (
+              typeof val === 'string' &&
+              rule.value &&
+              !new RegExp(rule.value as string | RegExp).test(val)
+            ) {
+              errors.push(rule.message || 'Invalid format');
             }
-            if (typeof val === 'string' && val.length > rule.value) {
-              errors.push(rule.message || `Must be at most ${rule.value} characters`);
+            break;
+          case 'custom':
+            if (rule.validator && !rule.validator(val)) {
+              errors.push(rule.message || 'Validation failed');
             }
-            if (Array.isArray(val) && val.length > rule.value) {
-              errors.push(rule.message || `Select at most ${rule.value} items`);
-            }
-          }
-          break;
-        case 'pattern':
-          if (typeof val === 'string' && rule.value && !new RegExp(rule.value as string | RegExp).test(val)) {
-            errors.push(rule.message || 'Invalid format');
-          }
-          break;
-        case 'custom':
-          if (rule.validator && !rule.validator(val)) {
-            errors.push(rule.message || 'Validation failed');
-          }
-          break;
+            break;
+        }
       }
-    }
 
-    if (onValidate) {
-      errors.push(...onValidate(val));
-    }
+      if (onValidate) {
+        errors.push(...onValidate(val));
+      }
 
-    return errors;
-  }, [question.validation, onValidate]);
+      return errors;
+    },
+    [question.validation, onValidate],
+  );
 
   useEffect(() => {
     if (touched && value !== undefined) {
@@ -121,7 +138,7 @@ export function QuestionWrapper<T = unknown>({
   const isDisabled = disabled || readOnly;
 
   return (
-    <div 
+    <div
       className={`
         question-wrapper 
         ${className}
@@ -149,11 +166,8 @@ export function QuestionWrapper<T = unknown>({
         </div>
         {question.tags && question.tags.length > 0 && (
           <div className="flex gap-1">
-            {question.tags.map(tag => (
-              <span 
-                key={tag}
-                className="px-2 py-1 text-xs bg-gray-100 text-gray-600 rounded-full"
-              >
+            {question.tags.map((tag) => (
+              <span key={tag} className="px-2 py-1 text-xs bg-gray-100 text-gray-600 rounded-full">
                 {tag}
               </span>
             ))}
@@ -161,7 +175,7 @@ export function QuestionWrapper<T = unknown>({
         )}
       </div>
 
-      <div 
+      <div
         className={`
           question-content 
           p-3 

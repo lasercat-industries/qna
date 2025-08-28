@@ -1,4 +1,4 @@
-export type QuestionType = 
+export type QuestionType =
   | 'short-answer'
   | 'long-form'
   | 'multiple-choice'
@@ -9,16 +9,16 @@ export type QuestionType =
 
 export type Priority = 'low' | 'medium' | 'high' | 'critical';
 
-export type ConditionOperator = 
-  | 'equals' 
+export type ConditionOperator =
+  | 'equals'
   | 'not-equals'
-  | 'contains' 
+  | 'contains'
   | 'not-contains'
-  | 'greater-than' 
-  | 'less-than' 
+  | 'greater-than'
+  | 'less-than'
   | 'greater-than-or-equal'
   | 'less-than-or-equal'
-  | 'in' 
+  | 'in'
   | 'not-in'
   | 'is-empty'
   | 'is-not-empty';
@@ -127,7 +127,7 @@ export interface NumericQuestion extends Question<number> {
   showAsPercentage?: boolean;
 }
 
-export type AnyQuestion = 
+export type AnyQuestion =
   | ShortAnswerQuestion
   | LongFormQuestion
   | MultipleChoiceQuestion
@@ -136,7 +136,7 @@ export type AnyQuestion =
   | StackRankingQuestion
   | NumericQuestion;
 
-export interface QuestionGroup {
+export interface QuestionGroupType {
   id: string;
   name: string;
   description?: string;

@@ -2,7 +2,7 @@
   "extends": ["@lasercat/config/tsconfig.build.json"],
   "compilerOptions": {
     "lib": ["ESNext", "DOM", "DOM.Iterable"],
-    "jsx": "react",
+    "jsx": "react"
   },
-  "include": ["${configDir}/src/questions/**/*", "${configDir}/src/index.ts"],
+  "include": ["${configDir}/src/questions/**/*", "${configDir}/src/index.ts"]
 }

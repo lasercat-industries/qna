@@ -15,7 +15,7 @@ describe('ShortAnswer Component Basic', () => {
       text: 'Test question',
       required: false,
       priority: 'medium',
-      tags: ['test']
+      tags: ['test'],
     };
 
     expect(mockQuestion.type).toBe('short-answer');

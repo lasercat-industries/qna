@@ -2,6 +2,6 @@
   "extends": "@lasercat/config/tsconfig.json",
   "compilerOptions": {
     "lib": ["ESNext", "DOM", "DOM.Iterable"],
-    "jsx": "react",
+    "jsx": "react"
   }
 }

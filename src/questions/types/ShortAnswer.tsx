@@ -10,7 +10,7 @@ export const ShortAnswer: React.FC<QuestionComponentProps<string>> = ({
   disabled = false,
   readOnly = false,
   error,
-  className = ''
+  className = '',
 }) => {
   const q = question as ShortAnswerQuestion;
   const [localValue, setLocalValue] = useState(value);
@@ -23,8 +23,8 @@ export const ShortAnswer: React.FC<QuestionComponentProps<string>> = ({
 
   useEffect(() => {
     if (q.suggestions && localValue && !disabled && !readOnly) {
-      const filtered = q.suggestions.filter(s => 
-        s.toLowerCase().includes(localValue.toLowerCase())
+      const filtered = q.suggestions.filter((s) =>
+        s.toLowerCase().includes(localValue.toLowerCase()),
       );
       setFilteredSuggestions(filtered);
       setShowSuggestions(filtered.length > 0);
@@ -36,7 +36,7 @@ export const ShortAnswer: React.FC<QuestionComponentProps<string>> = ({
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = e.target.value;
     if (q.maxLength && newValue.length > q.maxLength) return;
-    
+
     setLocalValue(newValue);
     onChange(newValue);
   };
@@ -87,7 +87,7 @@ export const ShortAnswer: React.FC<QuestionComponentProps<string>> = ({
           onFocus={() => q.suggestions && setShowSuggestions(true)}
           onKeyDown={handleKeyDown}
         />
-        
+
         {q.maxLength && (
           <div className="absolute right-2 top-2 text-xs text-gray-500">
             {localValue.length}/{q.maxLength}

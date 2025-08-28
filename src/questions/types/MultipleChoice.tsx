@@ -1,5 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import type { MultipleChoiceQuestion, MultipleChoiceOption, QuestionComponentProps } from '../types';
+import type {
+  MultipleChoiceQuestion,
+  MultipleChoiceOption,
+  QuestionComponentProps,
+} from '../types';
 import QuestionWrapper from '../core/QuestionWrapper';
 
 export const MultipleChoice: React.FC<QuestionComponentProps<string | string[]>> = ({
@@ -10,11 +14,11 @@ export const MultipleChoice: React.FC<QuestionComponentProps<string | string[]>>
   disabled = false,
   readOnly = false,
   error,
-  className = ''
+  className = '',
 }) => {
   const q = question as MultipleChoiceQuestion;
   const [localValue, setLocalValue] = useState<string | string[]>(
-    q.multiple ? (Array.isArray(value) ? value : []) : (value as string)
+    q.multiple ? (Array.isArray(value) ? value : []) : (value as string),
   );
   const [showOtherInput, setShowOtherInput] = useState(false);
   const [otherValue, setOtherValue] = useState('');
@@ -25,13 +29,13 @@ export const MultipleChoice: React.FC<QuestionComponentProps<string | string[]>>
     } else {
       setLocalValue(value as string);
     }
-    
+
     if (q.showOther) {
-      const isOtherSelected = q.multiple 
-        ? (Array.isArray(value) && value.includes('other'))
+      const isOtherSelected = q.multiple
+        ? Array.isArray(value) && value.includes('other')
         : value === 'other';
       setShowOtherInput(isOtherSelected);
-      
+
       if (isOtherSelected && typeof value === 'string' && value.startsWith('other:')) {
         setOtherValue(value.substring(6));
       }
@@ -57,14 +61,14 @@ export const MultipleChoice: React.FC<QuestionComponentProps<string | string[]>>
     if (optionId === 'other' && q.showOther) {
       if (currentValues.includes('other')) {
         setShowOtherInput(false);
-        newValues = currentValues.filter(v => v !== 'other');
+        newValues = currentValues.filter((v) => v !== 'other');
       } else {
         setShowOtherInput(true);
         newValues = [...currentValues, 'other'];
       }
     } else {
       if (currentValues.includes(optionId)) {
-        newValues = currentValues.filter(v => v !== optionId);
+        newValues = currentValues.filter((v) => v !== optionId);
       } else {
         newValues = [...currentValues, optionId];
       }
@@ -77,10 +81,10 @@ export const MultipleChoice: React.FC<QuestionComponentProps<string | string[]>>
   const handleOtherInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newOtherValue = e.target.value;
     setOtherValue(newOtherValue);
-    
+
     if (q.multiple) {
       const currentValues = Array.isArray(localValue) ? localValue : [];
-      const filteredValues = currentValues.filter(v => !v.startsWith('other'));
+      const filteredValues = currentValues.filter((v) => !v.startsWith('other'));
       onChange([...filteredValues, `other:${newOtherValue}`]);
     } else {
       onChange(`other:${newOtherValue}`);
@@ -117,12 +121,14 @@ export const MultipleChoice: React.FC<QuestionComponentProps<string | string[]>>
           name={`question-${question.id}`}
           type={inputType}
           value={option.id}
-          onChange={() => q.multiple ? handleMultipleChange(option.id) : handleSingleChange(option.id)}
+          onChange={() =>
+            q.multiple ? handleMultipleChange(option.id) : handleSingleChange(option.id)
+          }
         />
         <div className="flex-1">
           {option.image && (
-            <img 
-              alt={option.label} 
+            <img
+              alt={option.label}
               className="w-full h-32 object-cover rounded mb-2"
               src={option.image}
             />
@@ -153,7 +159,7 @@ export const MultipleChoice: React.FC<QuestionComponentProps<string | string[]>>
       <div className="space-y-3">
         <div className={`grid ${gridClass} gap-2`}>
           {q.options.map(renderOption)}
-          
+
           {q.showOther && (
             <label
               className={`
@@ -171,7 +177,9 @@ export const MultipleChoice: React.FC<QuestionComponentProps<string | string[]>>
                 name={`question-${question.id}`}
                 type={q.multiple ? 'checkbox' : 'radio'}
                 value="other"
-                onChange={() => q.multiple ? handleMultipleChange('other') : handleSingleChange('other')}
+                onChange={() =>
+                  q.multiple ? handleMultipleChange('other') : handleSingleChange('other')
+                }
               />
               <div className="flex-1">
                 <div className="font-medium">{q.otherLabel || 'Other'}</div>

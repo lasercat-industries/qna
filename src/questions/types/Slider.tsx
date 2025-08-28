@@ -10,10 +10,13 @@ export const Slider: React.FC<QuestionComponentProps<number | [number, number]>>
   disabled = false,
   readOnly = false,
   error,
-  className = ''
+  className = '',
 }) => {
   const q = question as SliderQuestion;
-  const defaultValue = useMemo(() => q.dual ? [q.min, q.max] as [number, number] : q.min, [q.dual, q.min, q.max]);
+  const defaultValue = useMemo(
+    () => (q.dual ? ([q.min, q.max] as [number, number]) : q.min),
+    [q.dual, q.min, q.max],
+  );
   const [localValue, setLocalValue] = useState<number | [number, number]>(value ?? defaultValue);
 
   useEffect(() => {
@@ -28,17 +31,17 @@ export const Slider: React.FC<QuestionComponentProps<number | [number, number]>>
 
   const handleDualChange = (index: number, newValue: number) => {
     if (!Array.isArray(localValue)) return;
-    
+
     const updated: [number, number] = [...localValue] as [number, number];
     updated[index] = newValue;
-    
+
     // Ensure min <= max
     if (index === 0 && updated[0] > updated[1]) {
       updated[1] = updated[0];
     } else if (index === 1 && updated[1] < updated[0]) {
       updated[0] = updated[1];
     }
-    
+
     setLocalValue(updated);
     onChange(updated);
   };
@@ -53,7 +56,9 @@ export const Slider: React.FC<QuestionComponentProps<number | [number, number]>>
   };
 
   if (q.dual) {
-    const values: [number, number] = Array.isArray(localValue) ? localValue as [number, number] : [q.min, q.max];
+    const values: [number, number] = Array.isArray(localValue)
+      ? (localValue as [number, number])
+      : [q.min, q.max];
     const leftPercent = percentage(values[0]);
     const rightPercent = percentage(values[1]);
 
@@ -64,7 +69,7 @@ export const Slider: React.FC<QuestionComponentProps<number | [number, number]>>
         error={error}
         question={{
           ...q,
-          defaultValue: [q.min, q.max] as [number, number]
+          defaultValue: [q.min, q.max] as [number, number],
         }}
         readOnly={readOnly}
         value={values}
@@ -78,10 +83,10 @@ export const Slider: React.FC<QuestionComponentProps<number | [number, number]>>
                 className="absolute h-2 bg-blue-500 rounded-full"
                 style={{
                   left: `${leftPercent}%`,
-                  width: `${rightPercent - leftPercent}%`
+                  width: `${rightPercent - leftPercent}%`,
                 }}
               />
-              
+
               <input
                 aria-label={`${q.text} - Minimum value`}
                 className="absolute w-full -top-1 opacity-0 cursor-pointer"
@@ -94,7 +99,7 @@ export const Slider: React.FC<QuestionComponentProps<number | [number, number]>>
                 value={values[0]}
                 onChange={(e) => handleDualChange(0, parseFloat(e.target.value))}
               />
-              
+
               <input
                 aria-label={`${q.text} - Maximum value`}
                 className="absolute w-full -top-1 opacity-0 cursor-pointer"
@@ -107,7 +112,7 @@ export const Slider: React.FC<QuestionComponentProps<number | [number, number]>>
                 value={values[1]}
                 onChange={(e) => handleDualChange(1, parseFloat(e.target.value))}
               />
-              
+
               <div
                 className="absolute w-4 h-4 bg-blue-600 rounded-full -top-1 shadow-md"
                 style={{ left: `calc(${leftPercent}% - 8px)` }}
@@ -155,7 +160,7 @@ export const Slider: React.FC<QuestionComponentProps<number | [number, number]>>
       error={error}
       question={{
         ...q,
-        defaultValue: q.min
+        defaultValue: q.min,
       }}
       readOnly={readOnly}
       value={singleValue}
