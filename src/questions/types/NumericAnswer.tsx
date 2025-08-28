@@ -145,7 +145,7 @@ export const NumericAnswer: React.FC<QuestionComponentProps<number>> = ({
               w-full px-3 py-2 border rounded-md text-right
               ${disabled || readOnly ? 'bg-gray-100' : 'bg-white'}
               ${error ? 'border-red-500' : 'border-gray-300'}
-              ${q.unit || q.showAsPercentage ? 'pr-12' : ''}
+              ${q.unit || q.showAsPercentage ? 'pr-16' : ''}
               focus:outline-none focus:ring-2 focus:ring-blue-500
             `}
             disabled={disabled || readOnly}
@@ -158,8 +158,8 @@ export const NumericAnswer: React.FC<QuestionComponentProps<number>> = ({
           />
 
           {(q.unit || displayAsPercentage) && (
-            <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm pointer-events-none">
-              {displayAsPercentage && !isFocused ? '' : q.unit}
+            <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm pointer-events-none select-none">
+              <span className="ml-1">{displayAsPercentage && !isFocused ? '' : q.unit}</span>
             </div>
           )}
         </div>
