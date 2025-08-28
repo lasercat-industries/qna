@@ -4,5 +4,5 @@
     "lib": ["ESNext", "DOM", "DOM.Iterable"],
     "jsx": "react",
   },
-  "include": ["${configDir}/src/questions/**/*", "${configDir}/src/entry.ts"],
+  "include": ["${configDir}/src/questions/**/*", "${configDir}/src/index.ts"],
 }
