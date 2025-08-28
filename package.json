@@ -1,6 +1,6 @@
 {
   "name": "@lasercat/qna",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "A TypeScript-native library template with bun",
   "author": "Ryland Goldstein",
   "license": "MIT",
@@ -75,9 +75,9 @@
   "prettier": "@lasercat/config/.prettierrc.json",
   "peerDependencies": {
     "typescript": "^5.8.3",
-    "react-dom": "^19.1.1",
-    "react-router": "^7.8.2",
-    "react": "^19.1.1"
+    "react-dom": "^19.x",
+    "react-router": "^7.x",
+    "react": "^19.x"
   },
   "dependencies": {
     "@types/react-dom": "^19.1.9",
