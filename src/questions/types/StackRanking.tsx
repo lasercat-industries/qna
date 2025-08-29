@@ -17,6 +17,7 @@ export const StackRanking: React.FC<QuestionComponentProps<string[]>> = ({
   const [draggedItem, setDraggedItem] = useState<string | null>(null);
   const [dragOverItem, setDragOverItem] = useState<string | null>(null);
 
+  // Initialize items only once or when the question items change structurally
   useEffect(() => {
     // Initialize items based on value or default order
     if (value && value.length > 0) {
@@ -26,11 +27,20 @@ export const StackRanking: React.FC<QuestionComponentProps<string[]>> = ({
 
       // Add any missing items at the end
       const missingItems = q.items.filter((item) => !value.includes(item.id));
-      setItems([...orderedItems, ...missingItems]);
-    } else {
+      const newItems = [...orderedItems, ...missingItems];
+      
+      // Only update if the items have actually changed
+      setItems(prevItems => {
+        const hasChanged = prevItems.length !== newItems.length ||
+          prevItems.some((item, index) => item.id !== newItems[index]?.id);
+        return hasChanged ? newItems : prevItems;
+      });
+    } else if (items.length === 0) {
+      // Only set initial items if we don't have any yet
       setItems([...q.items]);
     }
-  }, [value, q.items]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [value?.join(','), q.items.map(i => i.id).join(',')]);
 
   const handleDragStart = (e: React.DragEvent, itemId: string) => {
     if (disabled || readOnly) return;
