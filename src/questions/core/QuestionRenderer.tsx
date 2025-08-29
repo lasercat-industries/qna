@@ -27,10 +27,12 @@ export const QuestionRenderer: React.FC<QuestionRendererProps> = ({
   value,
   onChange,
   onValidate,
+  onVeto,
   disabled,
   readOnly,
   error,
   className,
+  vetoed,
 }) => {
   // Props are passed directly to each component with proper typing
 
@@ -42,10 +44,12 @@ export const QuestionRenderer: React.FC<QuestionRendererProps> = ({
           value={value as string | undefined}
           onChange={onChange as (value: string) => void}
           onValidate={onValidate as ((value: string) => string[]) | undefined}
+          onVeto={onVeto}
           disabled={disabled}
           readOnly={readOnly}
           error={error}
           className={className}
+          vetoed={vetoed}
         />
       );
 
@@ -56,10 +60,12 @@ export const QuestionRenderer: React.FC<QuestionRendererProps> = ({
           value={value as string | undefined}
           onChange={onChange as (value: string) => void}
           onValidate={onValidate as ((value: string) => string[]) | undefined}
+          onVeto={onVeto}
           disabled={disabled}
           readOnly={readOnly}
           error={error}
           className={className}
+          vetoed={vetoed}
         />
       );
 
@@ -70,10 +76,12 @@ export const QuestionRenderer: React.FC<QuestionRendererProps> = ({
           value={value as (string | string[]) | undefined}
           onChange={onChange as (value: string | string[]) => void}
           onValidate={onValidate as ((value: string | string[]) => string[]) | undefined}
+          onVeto={onVeto}
           disabled={disabled}
           readOnly={readOnly}
           error={error}
           className={className}
+          vetoed={vetoed}
         />
       );
 
@@ -84,10 +92,12 @@ export const QuestionRenderer: React.FC<QuestionRendererProps> = ({
           value={value as boolean | undefined}
           onChange={onChange as (value: boolean) => void}
           onValidate={onValidate as ((value: boolean) => string[]) | undefined}
+          onVeto={onVeto}
           disabled={disabled}
           readOnly={readOnly}
           error={error}
           className={className}
+          vetoed={vetoed}
         />
       );
 
@@ -98,10 +108,12 @@ export const QuestionRenderer: React.FC<QuestionRendererProps> = ({
           value={value as (number | [number, number]) | undefined}
           onChange={onChange as (value: number | [number, number]) => void}
           onValidate={onValidate as ((value: number | [number, number]) => string[]) | undefined}
+          onVeto={onVeto}
           disabled={disabled}
           readOnly={readOnly}
           error={error}
           className={className}
+          vetoed={vetoed}
         />
       );
 
@@ -112,10 +124,12 @@ export const QuestionRenderer: React.FC<QuestionRendererProps> = ({
           value={value as string[] | undefined}
           onChange={onChange as (value: string[]) => void}
           onValidate={onValidate as ((value: string[]) => string[]) | undefined}
+          onVeto={onVeto}
           disabled={disabled}
           readOnly={readOnly}
           error={error}
           className={className}
+          vetoed={vetoed}
         />
       );
 
@@ -126,10 +140,12 @@ export const QuestionRenderer: React.FC<QuestionRendererProps> = ({
           value={value as number | undefined}
           onChange={onChange as (value: number) => void}
           onValidate={onValidate as ((value: number) => string[]) | undefined}
+          onVeto={onVeto}
           disabled={disabled}
           readOnly={readOnly}
           error={error}
           className={className}
+          vetoed={vetoed}
         />
       );
 

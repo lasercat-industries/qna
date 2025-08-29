@@ -9,6 +9,8 @@ export type QuestionType =
 
 export type Priority = 'low' | 'medium' | 'high' | 'critical';
 
+export type PriorityDisplayStyle = 'border-left' | 'border-all' | 'background' | 'chip' | 'none';
+
 export type ConditionOperator =
   | 'equals'
   | 'not-equals'
@@ -47,11 +49,14 @@ export interface Question<T = unknown> {
   placeholder?: string;
   required: boolean;
   priority: Priority;
+  priorityDisplayStyle?: PriorityDisplayStyle;
   tags: string[];
   validation?: ValidationRule[];
   conditions?: Condition[];
   defaultValue?: T;
   metadata?: Record<string, unknown>;
+  allowVeto?: boolean;
+  vetoLabel?: string;
 }
 
 export interface ShortAnswerQuestion extends Question<string> {
@@ -90,6 +95,7 @@ export interface TrueFalseQuestion extends Question<boolean> {
   type: 'true-false';
   trueLabel?: string;
   falseLabel?: string;
+  displayStyle?: 'buttons' | 'toggle' | 'radio';
 }
 
 export interface SliderQuestion extends Question<number | [number, number]> {
@@ -153,6 +159,8 @@ export interface QuestionResponse<T = unknown> {
   timestamp: Date;
   valid: boolean;
   errors?: string[];
+  vetoed?: boolean;
+  vetoReason?: string;
 }
 
 export interface FormState {
@@ -170,8 +178,10 @@ export interface QuestionComponentProps<T = unknown> {
   value?: T;
   onChange: (value: T) => void;
   onValidate?: (value: T) => string[];
+  onVeto?: (vetoed: boolean, reason?: string) => void;
   disabled?: boolean;
   readOnly?: boolean;
   error?: string;
   className?: string;
+  vetoed?: boolean;
 }

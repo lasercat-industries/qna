@@ -88,6 +88,7 @@ const QuestionsDemo: React.FC = () => {
       tags: ['preferences'],
       trueLabel: 'Yes, I prefer remote',
       falseLabel: 'No, I prefer in-office',
+      displayStyle: 'toggle',  // Use toggle switch style
     },
     {
       id: 'remote-experience',
@@ -175,6 +176,8 @@ const QuestionsDemo: React.FC = () => {
       step: 1,
       precision: 0,
       unit: ' people',
+      allowVeto: true,
+      vetoLabel: 'This question is not applicable to my situation',
     },
     {
       id: 'availability',
@@ -202,7 +205,7 @@ const QuestionsDemo: React.FC = () => {
     },
   ];
 
-  // Individual questions not in any group
+  // Individual questions not in any group - demonstrating different priority styles
   const individualQuestions: AnyQuestion[] = [
     {
       id: 'consent',
@@ -211,9 +214,11 @@ const QuestionsDemo: React.FC = () => {
       description: 'Required for form submission',
       required: true,
       priority: 'critical',
+      priorityDisplayStyle: 'chip',  // Display as chip badge
       tags: ['legal'],
       trueLabel: 'I agree',
       falseLabel: 'I do not agree',
+      displayStyle: 'buttons',  // Use button style
     },
     {
       id: 'newsletter',
@@ -222,9 +227,11 @@ const QuestionsDemo: React.FC = () => {
       description: 'Optional - Get updates about new opportunities',
       required: false,
       priority: 'low',
+      priorityDisplayStyle: 'background',  // Display as background color
       tags: ['marketing'],
       trueLabel: 'Yes, subscribe me',
       falseLabel: 'No thanks',
+      displayStyle: 'radio',  // Use radio button style
     },
     {
       id: 'referral',
@@ -233,8 +240,11 @@ const QuestionsDemo: React.FC = () => {
       placeholder: 'e.g., Google, Friend, LinkedIn',
       required: false,
       priority: 'low',
+      priorityDisplayStyle: 'border-all',  // Display as full border
       tags: ['marketing'],
       maxLength: 200,
+      allowVeto: true,  // Allow users to veto this question
+      vetoLabel: 'This question feels irrelevant',
     },
     {
       id: 'urgency',
@@ -242,6 +252,7 @@ const QuestionsDemo: React.FC = () => {
       text: 'How soon do you need a response?',
       required: true,
       priority: 'high' as Priority,
+      priorityDisplayStyle: 'background',  // Default left border style
       tags: ['timing'],
       options: [
         { id: 'asap', label: 'ASAP', description: 'Within 24 hours' },
@@ -422,7 +433,7 @@ const QuestionsDemo: React.FC = () => {
               {individualQuestions
                 .filter(q => visibleQuestions.has(q.id))
                 .map((question) => (
-                  <div key={question.id} className="border-l-4 border-blue-500 pl-4">
+                  <div key={question.id}>
                     {question.required && (
                       <span className="inline-block px-2 py-1 text-xs font-medium text-red-600 bg-red-50 rounded mb-2">
                         Required
