@@ -18,10 +18,12 @@ A comprehensive library of React components for building dynamic forms with adva
 - 🔧 **Conditional Logic**: Show/hide questions based on other answers
 - ✅ **Built-in Validation**: Required fields, patterns, min/max constraints
 - 📊 **Question Groups**: Organize questions with collapsible sections
-- 🎨 **Priority Levels**: Critical, High, Medium, Low indicators
+- 🎨 **Priority Levels**: Critical, High, Medium, Low with configurable display styles
 - 🏷️ **Tag System**: Categorize and filter questions
+- 🚫 **Veto System**: Mark problematic questions with explanations
 - ♿ **Accessibility**: Full ARIA support and keyboard navigation
 - 📱 **Responsive**: Mobile-friendly design
+- 🎯 **Visual Indicators**: Required/Optional chips for questions and groups
 
 ## Installation
 
@@ -48,6 +50,7 @@ function App() {
     text: 'What is your name?',
     required: true,
     priority: 'high',
+    priorityDisplayStyle: 'chip', // New: configurable priority display
     tags: ['personal'],
     placeholder: 'Enter your full name',
     maxLength: 100
@@ -77,6 +80,7 @@ const shortAnswerQuestion = {
   placeholder: 'email@example.com',
   required: true,
   priority: 'high',
+  priorityDisplayStyle: 'border-left', // Options: border-left, border-all, background, chip, dot, none
   tags: ['contact'],
   maxLength: 255,
   pattern: '^[\\w-\\.]+@[\\w-]+\\.[a-z]{2,4}$',
@@ -95,6 +99,7 @@ const longFormQuestion = {
   description: 'Share your background and experience',
   required: false,
   priority: 'medium',
+  priorityDisplayStyle: 'background',
   tags: ['profile'],
   maxLength: 1000,
   rows: 5,
@@ -112,6 +117,7 @@ const multipleChoiceQuestion = {
   text: 'Select your skills',
   required: true,
   priority: 'high',
+  priorityDisplayStyle: 'chip',
   tags: ['technical'],
   options: [
     { id: 'js', label: 'JavaScript', description: 'ES6+' },
@@ -128,7 +134,7 @@ const multipleChoiceQuestion = {
 ```
 
 ### 4. True/False
-Binary choice questions with custom labels.
+Binary choice questions with configurable display styles.
 
 ```tsx
 const trueFalseQuestion = {
@@ -137,14 +143,16 @@ const trueFalseQuestion = {
   text: 'Are you open to remote work?',
   required: true,
   priority: 'medium',
+  priorityDisplayStyle: 'dot',
   tags: ['preferences'],
   trueLabel: 'Yes, I prefer remote',
-  falseLabel: 'No, I prefer in-office'
+  falseLabel: 'No, I prefer in-office',
+  displayStyle: 'buttons' // Options: buttons, toggle, radio
 };
 ```
 
 ### 5. Slider
-Single or dual-handle range sliders with manual input.
+Single or dual-handle range sliders with manual input support.
 
 ```tsx
 // Single slider
@@ -169,7 +177,7 @@ const singleSliderQuestion = {
   ]
 };
 
-// Dual range slider
+// Dual range slider with manual input
 const dualSliderQuestion = {
   id: 'salary-range',
   type: 'slider',
@@ -192,14 +200,14 @@ const dualSliderQuestion = {
 ```
 
 ### 6. Stack Ranking
-Drag-and-drop ranking with optional fixed items and ties.
+Drag-and-drop ranking with keyboard navigation support.
 
 ```tsx
 const stackRankingQuestion = {
   id: 'priorities',
   type: 'stack-ranking',
   text: 'Rank your priorities',
-  description: 'Drag to reorder from most to least important',
+  description: 'Drag to reorder or use arrow keys',
   required: true,
   priority: 'medium',
   tags: ['preferences'],
@@ -221,12 +229,12 @@ const stackRankingQuestion = {
     { id: 'culture', label: 'Company Culture' }
   ],
   allowTies: false,  // Cannot have same rank
-  showNumbers: true
+  maxSelections: 3   // Optional: limit how many can be ranked
 };
 ```
 
 ### 7. Numeric Answer
-Number input with increment/decrement controls.
+Number input with increment/decrement controls and percentage display.
 
 ```tsx
 const numericQuestion = {
@@ -241,7 +249,7 @@ const numericQuestion = {
   step: 1,
   precision: 0,  // Decimal places
   unit: ' people',
-  showAsPercentage: false,
+  showAsPercentage: true,  // Can toggle between percentage and raw value
   placeholder: 'Enter a number'
 };
 ```
@@ -258,6 +266,8 @@ interface QuestionResponse {
   timestamp: Date;
   valid: boolean;
   errors: string[];
+  vetoed?: boolean;  // If question was marked as problematic
+  vetoReason?: string;  // Explanation for veto
 }
 ```
 
@@ -347,12 +357,7 @@ interface QuestionResponse {
 ```json
 {
   "questionId": "priorities",
-  "value": [
-    { "id": "balance", "rank": 1 },
-    { "id": "salary", "rank": 2 },
-    { "id": "growth", "rank": 3 },
-    { "id": "culture", "rank": 4 }
-  ],
+  "value": ["balance", "salary", "growth", "culture"],
   "timestamp": "2024-01-15T10:30:00Z",
   "valid": true,
   "errors": []
@@ -367,6 +372,19 @@ interface QuestionResponse {
   "timestamp": "2024-01-15T10:30:00Z",
   "valid": true,
   "errors": []
+}
+```
+
+#### Vetoed Question
+```json
+{
+  "questionId": "confusing-question",
+  "value": "",
+  "timestamp": "2024-01-15T10:30:00Z",
+  "valid": true,
+  "errors": [],
+  "vetoed": true,
+  "vetoReason": "This question is unclear and needs clarification"
 }
 ```
 
@@ -389,225 +407,81 @@ interface FormState {
 }
 ```
 
-Example complete form submission:
-```json
-{
-  "responses": {
-    "name": {
-      "questionId": "name",
-      "value": "John Doe",
-      "timestamp": "2024-01-15T10:30:00Z",
-      "valid": true,
-      "errors": []
-    },
-    "email": {
-      "questionId": "email",
-      "value": "john@example.com",
-      "timestamp": "2024-01-15T10:30:01Z",
-      "valid": true,
-      "errors": []
-    },
-    "skills": {
-      "questionId": "skills",
-      "value": ["javascript", "react", "typescript"],
-      "timestamp": "2024-01-15T10:30:05Z",
-      "valid": true,
-      "errors": []
-    },
-    "remote": {
-      "questionId": "remote",
-      "value": true,
-      "timestamp": "2024-01-15T10:30:10Z",
-      "valid": true,
-      "errors": []
-    },
-    "salary-range": {
-      "questionId": "salary-range",
-      "value": [80000, 120000],
-      "timestamp": "2024-01-15T10:30:15Z",
-      "valid": true,
-      "errors": []
-    }
-  },
-  "completedGroups": ["personal", "professional"],
-  "errors": {},
-  "isDirty": false,
-  "isSubmitting": false,
-  "isValid": true
-}
-```
-
-## Usage Examples
-
-### Complete Form with Groups
-
-```tsx
-import React, { useState } from 'react';
-import { 
-  QuestionGroup, 
-  QuestionRenderer,
-  ConditionalLogicEngine 
-} from '@your-org/qna';
-
-function JobApplicationForm() {
-  const [formState, setFormState] = useState({
-    responses: {},
-    errors: {},
-    isDirty: false
-  });
-
-  // Define individual questions (not in groups)
-  const standaloneQuestions = [
-    {
-      id: 'consent',
-      type: 'true-false',
-      text: 'I agree to the terms and conditions',
-      required: true,
-      priority: 'critical',
-      tags: ['legal']
-    },
-    {
-      id: 'newsletter',
-      type: 'true-false', 
-      text: 'Subscribe to newsletter?',
-      required: false,
-      priority: 'low',
-      tags: ['marketing']
-    }
-  ];
-
-  // Define questions for groups
-  const personalQuestions = [
-    {
-      id: 'name',
-      type: 'short-answer',
-      text: 'Full Name',
-      required: true,
-      priority: 'high',
-      tags: ['personal']
-    },
-    {
-      id: 'email',
-      type: 'short-answer',
-      text: 'Email Address',
-      required: true,
-      priority: 'high',
-      tags: ['personal'],
-      pattern: '^[\\w-\\.]+@[\\w-]+\\.[a-z]{2,4}$'
-    }
-  ];
-
-  // Define groups
-  const questionGroups = [
-    {
-      id: 'personal',
-      name: 'Personal Information',
-      description: 'Basic contact details',
-      questions: personalQuestions,
-      priority: 'high',
-      tags: ['required'],
-      collapsible: true,
-      defaultExpanded: true
-    }
-  ];
-
-  const handleQuestionChange = (questionId, value) => {
-    setFormState(prev => ({
-      ...prev,
-      responses: {
-        ...prev.responses,
-        [questionId]: {
-          questionId,
-          value,
-          timestamp: new Date(),
-          valid: true,
-          errors: []
-        }
-      },
-      isDirty: true
-    }));
-  };
-
-  return (
-    <div className="max-w-4xl mx-auto p-6">
-      <h1>Job Application</h1>
-      
-      {/* Standalone Questions */}
-      <div className="mb-8">
-        <h2>Quick Questions</h2>
-        {standaloneQuestions.map(question => (
-          <div key={question.id} className="mb-4">
-            <QuestionRenderer
-              question={question}
-              value={formState.responses[question.id]?.value}
-              onChange={(value) => handleQuestionChange(question.id, value)}
-            />
-          </div>
-        ))}
-      </div>
-
-      {/* Question Groups */}
-      {questionGroups.map(group => (
-        <QuestionGroup
-          key={group.id}
-          group={group}
-          responses={formState.responses}
-          onQuestionChange={handleQuestionChange}
-        />
-      ))}
-    </div>
-  );
-}
-```
-
-### With Conditional Logic
-
-```tsx
-const questions = [
-  {
-    id: 'has-experience',
-    type: 'true-false',
-    text: 'Do you have prior experience?',
-    required: true
-  },
-  {
-    id: 'years-experience',
-    type: 'numeric',
-    text: 'How many years?',
-    min: 0,
-    max: 50,
-    // This question only shows if has-experience is true
-    conditions: [
-      {
-        questionId: 'has-experience',
-        operator: 'equals',
-        value: true,
-        action: 'show'
-      }
-    ]
-  }
-];
-```
-
 ## Advanced Features
 
-### Priority Levels
-- `critical`: Red indicator, highest importance
-- `high`: Orange indicator, important
-- `medium`: Yellow indicator, moderate importance  
-- `low`: Gray indicator, optional/nice-to-have
+### Priority Display Styles
+Configure how priority is visually represented:
 
-### Conditional Logic Operators
-- `equals` / `not-equals`
-- `contains` / `not-contains`
-- `greater-than` / `less-than`
-- `greater-than-or-equal` / `less-than-or-equal`
-- `in` / `not-in`
-- `is-empty` / `is-not-empty`
+- `border-left`: Colored left border on input area (default)
+- `border-all`: Colored border around entire question
+- `background`: Colored background for input area
+- `chip`: Priority level shown as a chip/badge
+- `dot`: Colored dot icon next to question
+- `none`: No priority indication
 
-### Conditional Actions
-- `show` / `hide`: Toggle visibility
-- `require` / `disable` / `enable`: Change interaction state
+```tsx
+const question = {
+  // ...
+  priority: 'high',
+  priorityDisplayStyle: 'chip' // Shows as "HIGH" chip
+};
+```
+
+### Veto System
+Allow users to flag problematic questions:
+
+```tsx
+const question = {
+  // ...
+  allowVeto: true,
+  vetoLabel: 'This question is problematic' // Custom label
+};
+
+// Handler
+const handleVeto = (questionId: string, vetoed: boolean, reason?: string) => {
+  console.log(`Question ${questionId} vetoed: ${vetoed}, reason: ${reason}`);
+};
+```
+
+### Question Groups
+Groups automatically determine if they're required based on their contents:
+- A group is **required** if it contains any required questions
+- A group is **optional** if all questions are optional
+
+```tsx
+const group = {
+  id: 'personal',
+  name: 'Personal Information',
+  description: 'Basic information about you',
+  questions: [
+    { id: 'name', required: true, ... },  // This makes the group required
+    { id: 'bio', required: false, ... }
+  ],
+  priority: 'high',
+  tags: [],
+  collapsible: true,
+  defaultExpanded: true
+};
+// This group will display "Required" chip automatically
+```
+
+### Visual Indicators
+- **Required Fields**: Red "Required" chip displayed with tags
+- **Optional Fields**: No chip (implicit)
+- **Priority Indicators**: Configurable via `priorityDisplayStyle`
+- **Group Status**: Automatic "Required"/"Optional" chips based on contents
+
+### Form Validation
+- Prevents submission if required fields are incomplete
+- Includes default values for untouched optional questions
+- Vetoed questions are excluded from validation
+- Real-time validation feedback
+
+### Demo Pages
+The library includes two demo pages:
+
+1. **Full Demo** (`/`): Comprehensive showcase with all question types, groups, and conditional logic
+2. **Simple Demo** (`/simple`): Minimal example with 4 basic questions
 
 ## Development
 
@@ -641,10 +515,15 @@ import type {
   QuestionResponse,
   FormState,
   Priority,
+  PriorityDisplayStyle,
   QuestionGroupType,
   ShortAnswerQuestion,
   MultipleChoiceQuestion,
-  // ... etc
+  TrueFalseQuestion,
+  SliderQuestion,
+  StackRankingQuestion,
+  NumericQuestion,
+  LongFormQuestion
 } from '@your-org/qna';
 ```
 
