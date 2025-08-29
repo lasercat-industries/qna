@@ -9,7 +9,7 @@ export type QuestionType =
 
 export type Priority = 'low' | 'medium' | 'high' | 'critical';
 
-export type PriorityDisplayStyle = 'border-left' | 'border-all' | 'background' | 'chip' | 'none';
+export type PriorityDisplayStyle = 'border-left' | 'border-all' | 'background' | 'chip' | 'dot' | 'none';
 
 export type ConditionOperator =
   | 'equals'

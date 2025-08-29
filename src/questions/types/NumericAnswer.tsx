@@ -157,9 +157,9 @@ export const NumericAnswer: React.FC<QuestionComponentProps<number>> = ({
             onFocus={handleFocus}
           />
 
-          {(q.unit || displayAsPercentage) && (
+          {(q.unit || (displayAsPercentage && !isFocused)) && (
             <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm pointer-events-none select-none">
-              <span className="ml-1">{displayAsPercentage && !isFocused ? '' : q.unit}</span>
+              <span className="ml-1">{q.unit || ''}</span>
             </div>
           )}
         </div>

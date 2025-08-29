@@ -39,7 +39,6 @@ export const StackRanking: React.FC<QuestionComponentProps<string[]>> = ({
       // Only set initial items if we don't have any yet
       setItems([...q.items]);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [value?.join(','), q.items.map(i => i.id).join(',')]);
 
   const handleDragStart = (e: React.DragEvent, itemId: string) => {

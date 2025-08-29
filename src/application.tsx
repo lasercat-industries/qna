@@ -365,12 +365,89 @@ const QuestionsDemo: React.FC = () => {
   };
 
   const handleSubmit = () => {
+    // Check if all required questions are answered
+    const allQuestions = [...sampleQuestions, ...individualQuestions];
+    const requiredQuestions = allQuestions.filter(q => q.required && visibleQuestions.has(q.id));
+    
+    const unansweredRequired = requiredQuestions.filter(question => {
+      const response = formState.responses[question.id];
+      if (!response) return true;
+      
+      // Check if vetoed (counts as answered)
+      if (response.vetoed) return false;
+      
+      const value = response.value;
+      
+      // Check if value is actually provided
+      switch (question.type) {
+        case 'short-answer':
+        case 'long-form':
+          return !value || (typeof value === 'string' && value.trim().length === 0);
+        case 'multiple-choice':
+          return Array.isArray(value) ? value.length === 0 : !value;
+        case 'true-false':
+          return value === undefined || value === null;
+        case 'numeric':
+          return value === undefined || value === null;
+        case 'slider':
+          return value === undefined || value === null;
+        case 'stack-ranking':
+          return !Array.isArray(value) || value.length === 0;
+        default:
+          return true;
+      }
+    });
+    
+    if (unansweredRequired.length > 0) {
+      alert(`Please answer all required questions:\n${unansweredRequired.map(q => `- ${q.text}`).join('\n')}`);
+      return;
+    }
+    
     setFormState((prev) => ({ ...prev, isSubmitting: true }));
+    
+    // Include default values for all untouched optional questions
+    const completeResponses = { ...formState.responses };
+    allQuestions.forEach(question => {
+      if (!completeResponses[question.id] && visibleQuestions.has(question.id)) {
+        let defaultValue: unknown;
+        switch (question.type) {
+          case 'short-answer':
+          case 'long-form':
+            defaultValue = '';
+            break;
+          case 'multiple-choice':
+            defaultValue = question.multiple ? [] : '';
+            break;
+          case 'true-false':
+            defaultValue = false;
+            break;
+          case 'slider':
+            defaultValue = question.dual ? [question.min, question.max] : question.min;
+            break;
+          case 'stack-ranking':
+            defaultValue = question.items.map(item => item.id);
+            break;
+          case 'numeric':
+            defaultValue = 0;
+            break;
+          default:
+            defaultValue = null;
+        }
+        
+        completeResponses[question.id] = {
+          questionId: question.id,
+          value: defaultValue,
+          timestamp: new Date(),
+          valid: true,
+          errors: [],
+        };
+      }
+    });
 
     // Simulate submission
     setTimeout(() => {
-      console.log('Form submitted:', formState.responses);
-      alert('Form submitted successfully! Check console for data.');
+      console.log('Form submitted with all values:', completeResponses);
+      alert('Form submitted successfully! Check console for complete data including defaults.');
       setFormState((prev) => ({ ...prev, isSubmitting: false, isDirty: false }));
     }, 1000);
   };
@@ -434,16 +511,6 @@ const QuestionsDemo: React.FC = () => {
                 .filter(q => visibleQuestions.has(q.id))
                 .map((question) => (
                   <div key={question.id}>
-                    {question.required && (
-                      <span className="inline-block px-2 py-1 text-xs font-medium text-red-600 bg-red-50 rounded mb-2">
-                        Required
-                      </span>
-                    )}
-                    {!question.required && (
-                      <span className="inline-block px-2 py-1 text-xs font-medium text-green-600 bg-green-50 rounded mb-2">
-                        Optional
-                      </span>
-                    )}
                     <QuestionRenderer
                       question={question}
                       value={formState.responses[question.id]?.value}
@@ -476,6 +543,7 @@ const QuestionsDemo: React.FC = () => {
             className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed font-medium"
             disabled={formState.isSubmitting}
             onClick={handleSubmit}
+            title="Complete all required fields to submit"
           >
             {formState.isSubmitting ? 'Submitting...' : 'Submit Form'}
           </button>
