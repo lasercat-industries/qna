@@ -28,18 +28,18 @@ A comprehensive library of React components for building dynamic forms with adva
 ## Installation
 
 ```bash
-npm install @your-org/qna
+npm install @lasercat/qna
 # or
-yarn add @your-org/qna
+yarn add @lasercat/qna
 # or
-bun add @your-org/qna
+bun add @lasercat/qna
 ```
 
 ## Quick Start
 
 ```tsx
 import React, { useState } from 'react';
-import { QuestionRenderer } from '@your-org/qna';
+import { QuestionRenderer } from '@lasercat/qna';
 
 function App() {
   const [value, setValue] = useState('');
@@ -524,7 +524,7 @@ import type {
   StackRankingQuestion,
   NumericQuestion,
   LongFormQuestion
-} from '@your-org/qna';
+} from '@lasercat/qna';
 ```
 
 ## Browser Support
