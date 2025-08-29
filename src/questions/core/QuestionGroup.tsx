@@ -39,6 +39,9 @@ export const QuestionGroup: React.FC<QuestionGroupProps> = ({
   const [isExpanded, setIsExpanded] = useState(group.defaultExpanded ?? true);
   const [completedQuestions, setCompletedQuestions] = useState<Set<string>>(new Set());
   const [visibleQuestions, setVisibleQuestions] = useState<Set<string>>(new Set());
+  
+  // Determine if group is required based on whether any questions are required
+  const isGroupRequired = group.questions.some(q => q.required);
 
   useEffect(() => {
     // Initialize all questions as visible
@@ -123,6 +126,16 @@ export const QuestionGroup: React.FC<QuestionGroupProps> = ({
         </div>
 
         <div className="flex items-center gap-3">
+          {isGroupRequired ? (
+            <span className="px-2 py-1 text-xs rounded-full bg-red-100 text-red-700 border border-red-300">
+              Required
+            </span>
+          ) : (
+            <span className="px-2 py-1 text-xs rounded-full bg-green-100 text-green-700 border border-green-300">
+              Optional
+            </span>
+          )}
+          
           {group.tags.length > 0 && (
             <div className="flex gap-1">
               {group.tags.map((tag) => (
