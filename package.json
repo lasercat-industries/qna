@@ -1,55 +1,13 @@
 {
   "name": "@lasercat/qna",
-  "version": "1.0.8",
-  "description": "A TypeScript-native library template with bun",
+  "version": "1.0.9",
   "author": "Ryland Goldstein",
-  "license": "MIT",
-  "main": "./dist/index.js",
-  "module": "./dist/index.js",
-  "types": "./dist/index.d.ts",
-  "type": "module",
-  "exports": {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.js",
-      "default": "./dist/index.js"
-    },
-    "./types": {
-      "types": "./dist/types/index.d.ts"
-    },
-    "./package.json": "./package.json"
-  },
-  "files": [
-    "dist",
-    "README.md",
-    "LICENSE"
-  ],
-  "keywords": [
-    "typescript"
-  ],
   "repository": {
     "type": "git",
     "url": "https://github.com/lasercat-industries/library-template.git"
   },
-  "bugs": {
-    "url": "https://github.com/lasercat-industries/library-template/issues"
-  },
-  "homepage": "https://github.com/lasercat-industries/library-template#readme",
-  "scripts": {
-    "prebuild": "bun run clean",
-    "build": "bun ./scripts/build.ts && bunx tsc --build --force tsconfig.build.json",
-    "dev": "vite",
-    "postbuild": "bun run build:validate",
-    "build:analyze": "bun run build && bunx source-map-explorer dist/*.js",
-    "build:check": "bun run build && bunx publint && bunx attw --pack",
-    "build:size": "bun run build && bunx size-limit",
-    "build:validate": "bun -e 'import(\"./dist/index.js\").then(() => console.log(\"✅ ESM import works\"))'",
-    "clean": "bun run scripts/clean.ts",
-    "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md}\" --ignore-path ./node_modules/@lasercat/config/.prettierignore",
-    "format:check": "prettier --check \"**/*.{ts,tsx,js,jsx,json,md}\" --ignore-path ./node_modules/@lasercat/config/.prettierignore",
-    "typecheck": "tsc --noEmit",
-    "lint": "eslint ."
-  },
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
   "devDependencies": {
     "@eslint/js": "^9.30.1",
     "@lasercat/config": "^1.2.3",
@@ -71,7 +29,6 @@
     "vite-tsconfig-paths": "^5.1.4",
     "vitest": "^3.2.4"
   },
-  "prettier": "@lasercat/config/.prettierrc.json",
   "peerDependencies": {
     "@types/bun": "latest",
     "@types/node": "24.x",
@@ -81,9 +38,47 @@
     "react-router": "^7.x",
     "typescript": "^5.8.3"
   },
-  "dependencies": {
-    "tree-sitter": "^0.25.0",
-    "tree-sitter-javascript": "^0.25.0",
-    "tree-sitter-typescript": "^0.23.2"
-  }
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    },
+    "./types": {
+      "types": "./dist/types/index.d.ts"
+    },
+    "./package.json": "./package.json"
+  },
+  "bugs": {
+    "url": "https://github.com/lasercat-industries/library-template/issues"
+  },
+  "description": "A TypeScript-native library template with bun",
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "homepage": "https://github.com/lasercat-industries/library-template#readme",
+  "keywords": [
+    "typescript"
+  ],
+  "license": "MIT",
+  "prettier": "@lasercat/config/.prettierrc.json",
+  "scripts": {
+    "prebuild": "bun run clean",
+    "build": "bun ./scripts/build.ts && bunx tsc --build --force tsconfig.build.json",
+    "dev": "vite",
+    "postbuild": "bun run build:validate",
+    "build:analyze": "bun run build && bunx source-map-explorer dist/*.js",
+    "build:check": "bun run build && bunx publint && bunx attw --pack",
+    "build:size": "bun run build && bunx size-limit",
+    "build:validate": "bun -e 'import(\"./dist/index.js\").then(() => console.log(\"✅ ESM import works\"))'",
+    "clean": "bun run scripts/clean.ts",
+    "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md}\" --ignore-path ./node_modules/@lasercat/config/.prettierignore",
+    "format:check": "prettier --check \"**/*.{ts,tsx,js,jsx,json,md}\" --ignore-path ./node_modules/@lasercat/config/.prettierignore",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint ."
+  },
+  "type": "module",
+  "types": "./dist/index.d.ts"
 }
