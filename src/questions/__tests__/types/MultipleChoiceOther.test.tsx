@@ -1,9 +1,9 @@
 import { expect, test, describe } from 'bun:test';
 import type { MultipleChoiceQuestion, MultipleChoiceAnswer } from '../../types';
 
-describe('MultipleChoice with Other Option', () => {
+describe('MultipleChoice with Additional Text', () => {
   describe('Type Definitions', () => {
-    test('MultipleChoiceQuestion supports otherOptionMode', () => {
+    test('MultipleChoiceQuestion supports allowAdditionalText', () => {
       const question: MultipleChoiceQuestion = {
         id: 'q1',
         type: 'multiple-choice',
@@ -16,17 +16,17 @@ describe('MultipleChoice with Other Option', () => {
           { id: 'opt2', label: 'Option 2' },
         ],
         multiple: true,
-        showOther: true,
-        otherLabel: 'Other preference',
-        otherOptionMode: 'exclusive',
+        allowAdditionalText: true,
+        additionalTextLabel: 'Additional comments',
+        additionalTextPlaceholder: 'Enter any additional information...',
       };
 
-      expect(question.otherOptionMode).toBe('exclusive');
-      expect(question.showOther).toBe(true);
-      expect(question.otherLabel).toBe('Other preference');
+      expect(question.allowAdditionalText).toBe(true);
+      expect(question.additionalTextLabel).toBe('Additional comments');
+      expect(question.additionalTextPlaceholder).toBe('Enter any additional information...');
     });
 
-    test('MultipleChoiceQuestion supports additional mode', () => {
+    test('MultipleChoiceQuestion without additional text', () => {
       const question: MultipleChoiceQuestion = {
         id: 'q2',
         type: 'multiple-choice',
@@ -39,43 +39,41 @@ describe('MultipleChoice with Other Option', () => {
           { id: 'py', label: 'Python' },
         ],
         multiple: true,
-        showOther: true,
-        otherOptionMode: 'additional',
+        allowAdditionalText: false,
       };
 
-      expect(question.otherOptionMode).toBe('additional');
+      expect(question.allowAdditionalText).toBe(false);
     });
 
     test('MultipleChoiceAnswer structure', () => {
       const answer: MultipleChoiceAnswer = {
-        selectedChoices: ['opt1', 'opt2', 'other'],
-        otherText: 'Custom option text',
+        selectedChoices: ['opt1', 'opt2'],
+        additionalText: 'Custom text input',
       };
 
-      expect(answer.selectedChoices).toHaveLength(3);
-      expect(answer.selectedChoices).toContain('other');
-      expect(answer.otherText).toBe('Custom option text');
+      expect(answer.selectedChoices).toHaveLength(2);
+      expect(answer.additionalText).toBe('Custom text input');
     });
   });
 
   describe('Answer Format', () => {
-    test('supports structured answer with other text', () => {
+    test('supports structured answer with additional text', () => {
       const answer: MultipleChoiceAnswer = {
-        selectedChoices: ['opt1', 'other'],
-        otherText: 'My custom answer',
+        selectedChoices: ['opt1'],
+        additionalText: 'My custom answer',
       };
 
-      expect(answer.selectedChoices).toEqual(['opt1', 'other']);
-      expect(answer.otherText).toBe('My custom answer');
+      expect(answer.selectedChoices).toEqual(['opt1']);
+      expect(answer.additionalText).toBe('My custom answer');
     });
 
-    test('supports answer without other option', () => {
+    test('supports answer without additional text', () => {
       const answer: MultipleChoiceAnswer = {
         selectedChoices: ['opt1', 'opt2'],
       };
 
       expect(answer.selectedChoices).toEqual(['opt1', 'opt2']);
-      expect(answer.otherText).toBeUndefined();
+      expect(answer.additionalText).toBeUndefined();
     });
 
     test('supports empty answer', () => {
@@ -85,86 +83,16 @@ describe('MultipleChoice with Other Option', () => {
 
       expect(answer.selectedChoices).toHaveLength(0);
     });
-  });
 
-  describe('Exclusive Mode Behavior', () => {
-    test('exclusive mode should clear other selections when other is selected', () => {
-      const initialChoices = ['opt1', 'opt2'];
-      const selectingOther = true;
+    test('supports answer with choices and text', () => {
+      const answer: MultipleChoiceAnswer = {
+        selectedChoices: ['js', 'py'],
+        additionalText: 'I also know Rust and Go',
+      };
 
-      let newChoices: string[];
-      if (selectingOther) {
-        newChoices = ['other'];
-      } else {
-        newChoices = initialChoices;
-      }
-
-      expect(newChoices).toEqual(['other']);
-      expect(newChoices).not.toContain('opt1');
-      expect(newChoices).not.toContain('opt2');
-    });
-
-    test('exclusive mode should clear other when selecting regular option', () => {
-      const currentChoices = ['other'];
-      const selectingOption = 'opt1';
-
-      const newChoices = [...currentChoices.filter((c) => c !== 'other'), selectingOption];
-
-      expect(newChoices).toContain('opt1');
-      expect(newChoices).not.toContain('other');
-    });
-  });
-
-  describe('Additional Mode Behavior', () => {
-    test('additional mode allows other with regular selections', () => {
-      const currentChoices = ['opt1', 'opt2'];
-      const addingOther = true;
-
-      let newChoices: string[];
-      if (addingOther) {
-        newChoices = [...currentChoices, 'other'];
-      } else {
-        newChoices = currentChoices;
-      }
-
-      expect(newChoices).toContain('opt1');
-      expect(newChoices).toContain('opt2');
-      expect(newChoices).toContain('other');
-      expect(newChoices).toHaveLength(3);
-    });
-
-    test('additional mode allows adding options after other is selected', () => {
-      const currentChoices = ['other'];
-      const addingOption = 'opt1';
-
-      const newChoices = [...currentChoices, addingOption];
-
-      expect(newChoices).toContain('other');
-      expect(newChoices).toContain('opt1');
-      expect(newChoices).toHaveLength(2);
-    });
-  });
-
-  describe('Legacy Format Support', () => {
-    test('supports legacy string array format', () => {
-      const legacyAnswer: string[] = ['opt1', 'opt2'];
-
-      expect(Array.isArray(legacyAnswer)).toBe(true);
-      expect(legacyAnswer).toHaveLength(2);
-    });
-
-    test('supports legacy single string format', () => {
-      const legacyAnswer: string = 'opt1';
-
-      expect(typeof legacyAnswer).toBe('string');
-      expect(legacyAnswer).toBe('opt1');
-    });
-
-    test('supports legacy other format with colon', () => {
-      const legacyOther: string = 'other:Custom text';
-
-      expect(legacyOther.startsWith('other:')).toBe(true);
-      expect(legacyOther.substring(6)).toBe('Custom text');
+      expect(answer.selectedChoices).toContain('js');
+      expect(answer.selectedChoices).toContain('py');
+      expect(answer.additionalText).toBe('I also know Rust and Go');
     });
   });
 
@@ -214,53 +142,56 @@ describe('MultipleChoice with Other Option', () => {
   });
 
   describe('Edge Cases', () => {
-    test('handles toggling other option on and off', () => {
-      let choices = ['opt1'];
-      let otherText = '';
-
-      // Select other
-      choices = [...choices, 'other'];
-      otherText = 'Some text';
-
-      expect(choices).toContain('other');
-      expect(otherText).toBe('Some text');
-
-      // Deselect other
-      choices = choices.filter((c) => c !== 'other');
-      otherText = '';
-
-      expect(choices).not.toContain('other');
-      expect(otherText).toBe('');
-    });
-
-    test('handles empty other text', () => {
+    test('handles empty additional text', () => {
       const answer: MultipleChoiceAnswer = {
-        selectedChoices: ['other'],
-        otherText: '',
+        selectedChoices: ['opt1'],
+        additionalText: '',
       };
 
-      expect(answer.selectedChoices).toContain('other');
-      expect(answer.otherText).toBe('');
+      expect(answer.selectedChoices).toContain('opt1');
+      expect(answer.additionalText).toBe('');
     });
 
-    test('handles other text updates', () => {
+    test('handles additional text updates', () => {
       const answer: MultipleChoiceAnswer = {
-        selectedChoices: ['other'],
-        otherText: 'Initial text',
+        selectedChoices: ['opt1'],
+        additionalText: 'Initial text',
       };
 
       const updatedAnswer: MultipleChoiceAnswer = {
         ...answer,
-        otherText: 'Updated text',
+        additionalText: 'Updated text',
       };
 
-      expect(updatedAnswer.otherText).toBe('Updated text');
+      expect(updatedAnswer.additionalText).toBe('Updated text');
       expect(updatedAnswer.selectedChoices).toEqual(answer.selectedChoices);
+    });
+
+    test('handles no selections with additional text', () => {
+      const answer: MultipleChoiceAnswer = {
+        selectedChoices: [],
+        additionalText: 'Just some text without selections',
+      };
+
+      expect(answer.selectedChoices).toHaveLength(0);
+      expect(answer.additionalText).toBe('Just some text without selections');
+    });
+
+    test('handles whitespace in additional text', () => {
+      const answer: MultipleChoiceAnswer = {
+        selectedChoices: ['opt1'],
+        additionalText: '   ',
+      };
+
+      expect(answer.additionalText).toBe('   ');
+      if (answer.additionalText) {
+        expect(answer.additionalText.trim()).toBe('');
+      }
     });
   });
 
-  describe('Single Select with Other', () => {
-    test('single select question with other option', () => {
+  describe('Single Select with Additional Text', () => {
+    test('single select question with additional text', () => {
       const question: MultipleChoiceQuestion = {
         id: 'q3',
         type: 'multiple-choice',
@@ -273,23 +204,50 @@ describe('MultipleChoice with Other Option', () => {
           { id: 'no', label: 'No' },
         ],
         multiple: false,
-        showOther: true,
-        otherLabel: 'Other answer',
+        allowAdditionalText: true,
+        additionalTextLabel: 'Please explain',
       };
 
       expect(question.multiple).toBe(false);
-      expect(question.showOther).toBe(true);
+      expect(question.allowAdditionalText).toBe(true);
     });
 
-    test('single select answer with other', () => {
+    test('single select answer with additional text', () => {
       const answer: MultipleChoiceAnswer = {
-        selectedChoices: ['other'],
-        otherText: 'Maybe',
+        selectedChoices: ['yes'],
+        additionalText: 'Because it makes sense',
       };
 
       expect(answer.selectedChoices).toHaveLength(1);
-      expect(answer.selectedChoices[0]).toBe('other');
-      expect(answer.otherText).toBe('Maybe');
+      expect(answer.selectedChoices[0]).toBe('yes');
+      expect(answer.additionalText).toBe('Because it makes sense');
+    });
+  });
+
+  describe('Multi-Select with Additional Text', () => {
+    test('can select multiple options and provide additional text', () => {
+      const answer: MultipleChoiceAnswer = {
+        selectedChoices: ['js', 'ts', 'py'],
+        additionalText: 'Also learning Rust',
+      };
+
+      expect(answer.selectedChoices).toHaveLength(3);
+      expect(answer.additionalText).toBeDefined();
+    });
+
+    test('can update selections without changing additional text', () => {
+      const initial: MultipleChoiceAnswer = {
+        selectedChoices: ['opt1'],
+        additionalText: 'My comment',
+      };
+
+      const updated: MultipleChoiceAnswer = {
+        ...initial,
+        selectedChoices: ['opt1', 'opt2'],
+      };
+
+      expect(updated.selectedChoices).toHaveLength(2);
+      expect(updated.additionalText).toBe('My comment');
     });
   });
 });

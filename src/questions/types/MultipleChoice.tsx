@@ -7,11 +7,9 @@ import type {
 } from '../types';
 import QuestionWrapper from '../core/QuestionWrapper';
 
-export const MultipleChoice: React.FC<
-  QuestionComponentProps<string | string[] | MultipleChoiceAnswer>
-> = ({
+export const MultipleChoice: React.FC<QuestionComponentProps<MultipleChoiceAnswer>> = ({
   question,
-  value = '',
+  value,
   onChange,
   onValidate,
   disabled = false,
@@ -20,71 +18,35 @@ export const MultipleChoice: React.FC<
   className = '',
 }) => {
   const q = question as MultipleChoiceQuestion;
-  const otherOptionMode = q.otherOptionMode || 'exclusive';
+  const additionalTextMode = q.additionalTextMode || 'additional';
 
-  // Parse initial value
-  const parseValue = (val: string | string[] | MultipleChoiceAnswer) => {
-    if (typeof val === 'object' && val !== null && 'selectedChoices' in val) {
-      return {
-        selectedChoices: val.selectedChoices || [],
-        otherText: val.otherText || '',
-      };
-    }
-
-    // Legacy format support
-    if (Array.isArray(val)) {
-      const otherItem = val.find((v) => v.startsWith('other:'));
-      const selectedChoices = val.filter((v) => v !== 'other' && !v.startsWith('other:'));
-      return {
-        selectedChoices: otherItem ? [...selectedChoices, 'other'] : selectedChoices,
-        otherText: otherItem ? otherItem.substring(6) : '',
-      };
-    }
-
-    if (typeof val === 'string') {
-      if (val.startsWith('other:')) {
-        return { selectedChoices: ['other'], otherText: val.substring(6) };
-      }
-      return { selectedChoices: val ? [val] : [], otherText: '' };
-    }
-
-    return { selectedChoices: [], otherText: '' };
+  const defaultValue: MultipleChoiceAnswer = {
+    selectedChoices: [],
+    additionalText: '',
   };
 
-  const initialParsed = parseValue(value);
-  const [selectedChoices, setSelectedChoices] = useState<string[]>(initialParsed.selectedChoices);
-  const [otherText, setOtherText] = useState(initialParsed.otherText);
+  const currentValue = value || defaultValue;
+
+  const [selectedChoices, setSelectedChoices] = useState<string[]>(
+    currentValue.selectedChoices || [],
+  );
+  const [additionalText, setAdditionalText] = useState(currentValue.additionalText || '');
 
   useEffect(() => {
-    const parsed = parseValue(value);
-    setSelectedChoices(parsed.selectedChoices);
-    setOtherText(parsed.otherText);
+    const val = value || defaultValue;
+    setSelectedChoices(val.selectedChoices || []);
+    setAdditionalText(val.additionalText || '');
   }, [value]);
 
   const emitChange = (choices: string[], text: string) => {
-    if (q.showOther && choices.includes('other')) {
-      // New format with structured answer
-      const answer: MultipleChoiceAnswer = {
-        selectedChoices: choices,
-        otherText: text,
-      };
-      onChange(answer as string | string[] | MultipleChoiceAnswer);
-    } else {
-      // Legacy format for backward compatibility
-      if (q.multiple) {
-        onChange(choices as string | string[] | MultipleChoiceAnswer);
-      } else {
-        onChange((choices[0] || '') as string | string[] | MultipleChoiceAnswer);
-      }
-    }
+    const answer: MultipleChoiceAnswer = {
+      selectedChoices: choices,
+      additionalText: text,
+    };
+    onChange(answer);
   };
 
   const handleOptionChange = (optionId: string) => {
-    if (optionId === 'other') {
-      handleOtherChange();
-      return;
-    }
-
     let newChoices: string[];
 
     if (q.multiple) {
@@ -92,64 +54,34 @@ export const MultipleChoice: React.FC<
         newChoices = selectedChoices.filter((v) => v !== optionId);
       } else {
         newChoices = [...selectedChoices, optionId];
-
-        // If exclusive mode and other is selected, deselect other
-        if (otherOptionMode === 'exclusive' && selectedChoices.includes('other')) {
-          newChoices = newChoices.filter((v) => v !== 'other');
-          setOtherText('');
-        }
       }
     } else {
       newChoices = [optionId];
-      // Clear other text when selecting a different option
-      if (selectedChoices.includes('other')) {
-        setOtherText('');
-      }
+    }
+
+    // In exclusive mode, clear additional text when selecting an option
+    let newText = additionalText;
+    if (q.allowAdditionalText && additionalTextMode === 'exclusive' && newChoices.length > 0) {
+      newText = '';
+      setAdditionalText('');
     }
 
     setSelectedChoices(newChoices);
-    emitChange(newChoices, otherText);
+    emitChange(newChoices, newText);
   };
 
-  const handleOtherChange = () => {
-    let newChoices: string[];
+  const handleAdditionalTextChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newText = e.target.value;
+    setAdditionalText(newText);
 
-    if (q.multiple) {
-      if (selectedChoices.includes('other')) {
-        // Deselecting other
-        newChoices = selectedChoices.filter((v) => v !== 'other');
-        setOtherText('');
-        setSelectedChoices(newChoices);
-        emitChange(newChoices, '');
-      } else {
-        // Selecting other
-        if (otherOptionMode === 'exclusive') {
-          // Clear all other selections
-          newChoices = ['other'];
-        } else {
-          // Keep other selections
-          newChoices = [...selectedChoices, 'other'];
-        }
-        setSelectedChoices(newChoices);
-        emitChange(newChoices, otherText);
-      }
-    } else {
-      // Single select
-      if (selectedChoices.includes('other')) {
-        newChoices = [];
-        setOtherText('');
-      } else {
-        newChoices = ['other'];
-      }
-      setSelectedChoices(newChoices);
-      emitChange(newChoices, otherText);
+    // In exclusive mode, clear selections when typing text
+    let newChoices = selectedChoices;
+    if (additionalTextMode === 'exclusive' && newText.trim().length > 0) {
+      newChoices = [];
+      setSelectedChoices([]);
     }
-  };
 
-  const handleOtherInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newOtherValue = e.target.value;
-    setOtherText(newOtherValue);
-    emitChange(selectedChoices, newOtherValue);
+    emitChange(newChoices, newText);
   };
 
   const isOptionSelected = (optionId: string): boolean => {
@@ -159,6 +91,10 @@ export const MultipleChoice: React.FC<
   const renderOption = (option: MultipleChoiceOption) => {
     const inputType = q.multiple ? 'checkbox' : 'radio';
     const isSelected = isOptionSelected(option.id);
+    const isDisabledByExclusiveMode =
+      q.allowAdditionalText &&
+      additionalTextMode === 'exclusive' &&
+      additionalText.trim().length > 0;
 
     return (
       <label
@@ -167,14 +103,14 @@ export const MultipleChoice: React.FC<
           flex items-start gap-3 p-3 rounded-lg border cursor-pointer
           transition-colors duration-200
           ${isSelected ? 'bg-blue-50 border-blue-300' : 'bg-white border-gray-200'}
-          ${disabled || readOnly ? 'opacity-60 cursor-not-allowed' : 'hover:bg-gray-50'}
+          ${disabled || readOnly || isDisabledByExclusiveMode ? 'opacity-60 cursor-not-allowed' : 'hover:bg-gray-50'}
         `}
       >
         <input
           aria-label={option.label}
           checked={isSelected}
           className="mt-1"
-          disabled={disabled || readOnly}
+          disabled={disabled || readOnly || isDisabledByExclusiveMode}
           name={`question-${question.id}`}
           type={inputType}
           value={option.id}
@@ -200,10 +136,11 @@ export const MultipleChoice: React.FC<
   const gridColumns = q.columns || (q.options.length <= 2 ? 1 : 2);
   const gridClass = `grid-cols-${gridColumns}`;
 
-  const showOtherInput = q.showOther && selectedChoices.includes('other');
+  const isTextInputDisabledByExclusiveMode =
+    additionalTextMode === 'exclusive' && selectedChoices.length > 0;
 
   return (
-    <QuestionWrapper<string | string[] | MultipleChoiceAnswer>
+    <QuestionWrapper<MultipleChoiceAnswer>
       className={className}
       disabled={disabled}
       error={error}
@@ -214,55 +151,37 @@ export const MultipleChoice: React.FC<
       onValidate={onValidate}
     >
       <div className="space-y-3">
-        <div className={`grid ${gridClass} gap-2`}>
-          {q.options.map(renderOption)}
+        <div className={`grid ${gridClass} gap-2`}>{q.options.map(renderOption)}</div>
 
-          {q.showOther && (
-            <label
+        {q.allowAdditionalText && (
+          <div className="pt-2 border-t border-gray-200">
+            <div className="flex items-start justify-between mb-2">
+              {q.additionalTextLabel && (
+                <label className="block text-sm font-medium text-gray-700">
+                  {q.additionalTextLabel}
+                </label>
+              )}
+              {additionalTextMode === 'exclusive' && (
+                <span className="text-xs text-gray-500 italic">
+                  {selectedChoices.length > 0
+                    ? 'Text disabled while options are selected'
+                    : 'Typing here will disable option selection'}
+                </span>
+              )}
+            </div>
+            <input
               className={`
-                flex items-start gap-3 p-3 rounded-lg border cursor-pointer
-                transition-colors duration-200
-                ${showOtherInput ? 'bg-blue-50 border-blue-300' : 'bg-white border-gray-200'}
-                ${disabled || readOnly ? 'opacity-60 cursor-not-allowed' : 'hover:bg-gray-50'}
+                w-full px-3 py-2 border rounded-md
+                ${disabled || readOnly || isTextInputDisabledByExclusiveMode ? 'bg-gray-100' : 'bg-white'}
+                border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500
               `}
-            >
-              <input
-                aria-label={q.otherLabel || 'Other'}
-                checked={showOtherInput}
-                className="mt-1"
-                disabled={disabled || readOnly}
-                name={`question-${question.id}`}
-                type={q.multiple ? 'checkbox' : 'radio'}
-                value="other"
-                onChange={handleOtherChange}
-              />
-              <div className="flex-1">
-                <div className="font-medium">{q.otherLabel || 'Other'}</div>
-                {q.otherOptionMode && (
-                  <div className="text-xs text-gray-500 mt-0.5">
-                    {q.otherOptionMode === 'exclusive'
-                      ? 'Selecting this will deselect other options'
-                      : 'Can be selected with other options'}
-                  </div>
-                )}
-              </div>
-            </label>
-          )}
-        </div>
-
-        {showOtherInput && (
-          <input
-            className={`
-              w-full px-3 py-2 border rounded-md
-              ${disabled || readOnly ? 'bg-gray-100' : 'bg-white'}
-              border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500
-            `}
-            disabled={disabled || readOnly}
-            placeholder="Please specify..."
-            type="text"
-            value={otherText}
-            onChange={handleOtherInputChange}
-          />
+              disabled={disabled || readOnly || isTextInputDisabledByExclusiveMode}
+              placeholder={q.additionalTextPlaceholder || 'Additional comments or information...'}
+              type="text"
+              value={additionalText}
+              onChange={handleAdditionalTextChange}
+            />
+          </div>
         )}
       </div>
     </QuestionWrapper>

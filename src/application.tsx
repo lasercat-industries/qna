@@ -58,8 +58,7 @@ const QuestionsDemo: React.FC = () => {
         { id: 'expert', label: 'Expert', description: '10+ years' },
       ],
       multiple: false,
-      showOther: true,
-      otherLabel: 'Other experience level',
+      allowAdditionalText: false,
     },
     {
       id: 'skills',
@@ -77,7 +76,7 @@ const QuestionsDemo: React.FC = () => {
         { id: 'python', label: 'Python' },
       ],
       multiple: true,
-      showOther: false,
+      allowAdditionalText: false,
     },
     {
       id: 'remote',
@@ -261,7 +260,7 @@ const QuestionsDemo: React.FC = () => {
         { id: 'flexible', label: "I'm flexible", description: 'No rush' },
       ],
       multiple: false,
-      showOther: false,
+      allowAdditionalText: false,
     },
     {
       id: 'additional-comments',
@@ -384,7 +383,11 @@ const QuestionsDemo: React.FC = () => {
         case 'long-form':
           return !value || (typeof value === 'string' && value.trim().length === 0);
         case 'multiple-choice':
-          return Array.isArray(value) ? value.length === 0 : !value;
+          if (typeof value === 'object' && value !== null && 'selectedChoices' in value) {
+            const multiChoiceVal = value as { selectedChoices: string[] };
+            return multiChoiceVal.selectedChoices.length === 0;
+          }
+          return true;
         case 'true-false':
           return value === undefined || value === null;
         case 'numeric':
@@ -418,7 +421,7 @@ const QuestionsDemo: React.FC = () => {
             defaultValue = '';
             break;
           case 'multiple-choice':
-            defaultValue = question.multiple ? [] : '';
+            defaultValue = { selectedChoices: [], additionalText: '' };
             break;
           case 'true-false':
             defaultValue = false;

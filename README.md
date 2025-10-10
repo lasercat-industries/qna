@@ -39,7 +39,7 @@ const question: MultipleChoiceQuestion = {
     { id: 'py', label: 'Python' },
   ],
   multiple: true,
-  showOther: false,
+  allowAdditionalText: false,
 };
 
 function MyForm() {
@@ -53,7 +53,7 @@ function MyForm() {
 
 ### Multiple Choice Questions
 
-Multiple choice questions support both single and multi-select modes, with an optional "Other" option for free-form text input.
+Multiple choice questions support both single and multi-select modes, with an optional always-visible text input for additional information.
 
 #### Basic Multiple Choice
 
@@ -71,45 +71,21 @@ const question: MultipleChoiceQuestion = {
     { id: 'green', label: 'Green' },
   ],
   multiple: false,
-  showOther: false,
+  allowAdditionalText: false,
 };
 ```
 
-#### Multiple Choice with "Other" Option
+#### Multiple Choice with Additional Text Input
 
-The "Other" option allows users to provide custom text input alongside predefined choices. You can configure whether the "Other" option is mutually exclusive or can be combined with other selections.
+The additional text feature allows users to provide free-form text alongside their selections. The text input is always visible at the bottom of the question when enabled. You can configure whether the text input and option selections work together or are mutually exclusive.
 
-##### Exclusive Mode (Default)
+##### Additional Mode (Default)
 
-When `otherOptionMode` is set to `'exclusive'`, selecting "Other" will deselect all other options, and selecting any other option will deselect "Other".
+When `additionalTextMode` is set to `'additional'` (or omitted, as it's the default), users can select options AND provide additional text - both work together.
 
 ```tsx
 const question: MultipleChoiceQuestion = {
   id: 'q2',
-  type: 'multiple-choice',
-  text: 'What is your primary programming language?',
-  required: true,
-  priority: 'high',
-  tags: [],
-  options: [
-    { id: 'js', label: 'JavaScript' },
-    { id: 'py', label: 'Python' },
-    { id: 'java', label: 'Java' },
-  ],
-  multiple: true,
-  showOther: true,
-  otherLabel: 'Other language',
-  otherOptionMode: 'exclusive', // Selecting "Other" clears all other selections
-};
-```
-
-##### Additional Mode
-
-When `otherOptionMode` is set to `'additional'`, users can select "Other" alongside regular options.
-
-```tsx
-const question: MultipleChoiceQuestion = {
-  id: 'q3',
   type: 'multiple-choice',
   text: 'What programming languages do you know?',
   required: true,
@@ -121,30 +97,65 @@ const question: MultipleChoiceQuestion = {
     { id: 'java', label: 'Java' },
   ],
   multiple: true,
-  showOther: true,
-  otherLabel: 'Other languages',
-  otherOptionMode: 'additional', // "Other" can be selected with other options
+  allowAdditionalText: true,
+  additionalTextMode: 'additional', // Users can select options AND type text
+  additionalTextLabel: 'Any other languages?',
+  additionalTextPlaceholder: 'e.g., Rust, Go, C++...',
+};
+```
+
+##### Exclusive Mode
+
+When `additionalTextMode` is set to `'exclusive'`, the text input and option selections are mutually exclusive:
+
+- Typing text in the input will clear all selected options and disable them
+- Selecting an option will clear the text input and disable it
+
+```tsx
+const question: MultipleChoiceQuestion = {
+  id: 'q3',
+  type: 'multiple-choice',
+  text: 'What is your PRIMARY development tool?',
+  required: true,
+  priority: 'high',
+  tags: [],
+  options: [
+    { id: 'vscode', label: 'VS Code' },
+    { id: 'intellij', label: 'IntelliJ IDEA' },
+    { id: 'vim', label: 'Vim/Neovim' },
+  ],
+  multiple: false,
+  allowAdditionalText: true,
+  additionalTextMode: 'exclusive', // Text and selections are mutually exclusive
+  additionalTextLabel: 'Or enter a different tool',
+  additionalTextPlaceholder: 'e.g., Sublime Text, Emacs...',
 };
 ```
 
 #### Answer Format
 
-When using the "Other" option, answers are returned in a structured format:
+When using the additional text feature, answers are returned in a structured format:
 
 ```tsx
 type MultipleChoiceAnswer = {
-  selectedChoices: string[]; // Array of selected option IDs including 'other'
-  otherText?: string; // The custom text when 'other' is selected
+  selectedChoices: string[]; // Array of selected option IDs
+  additionalText?: string; // The additional text provided
 };
 
-// Example answer:
+// Example answer with both selections and text (additional mode):
 const answer: MultipleChoiceAnswer = {
-  selectedChoices: ['js', 'py', 'other'],
-  otherText: 'Rust',
+  selectedChoices: ['js', 'py'],
+  additionalText: 'Also learning Rust',
+};
+
+// Example answer with only text (exclusive mode):
+const answer: MultipleChoiceAnswer = {
+  selectedChoices: [],
+  additionalText: 'Sublime Text',
 };
 ```
 
-**Note**: For backward compatibility, questions without the "Other" option still return `string` (single select) or `string[]` (multi-select) formats.
+**Note**: All multiple choice questions now use the `MultipleChoiceAnswer` format, regardless of whether `allowAdditionalText` is enabled. When `allowAdditionalText` is `false`, the `additionalText` field will be an empty string.
 
 ### Other Question Types
 

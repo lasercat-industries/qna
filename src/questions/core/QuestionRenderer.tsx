@@ -74,13 +74,9 @@ export const QuestionRenderer: React.FC<QuestionRendererProps> = ({
       return (
         <MultipleChoice
           question={question as MultipleChoiceQuestion}
-          value={value as (string | string[] | MultipleChoiceAnswer) | undefined}
-          onChange={onChange as (value: string | string[] | MultipleChoiceAnswer) => void}
-          onValidate={
-            onValidate as
-              | ((value: string | string[] | MultipleChoiceAnswer) => string[])
-              | undefined
-          }
+          value={value as MultipleChoiceAnswer | undefined}
+          onChange={onChange as (value: MultipleChoiceAnswer) => void}
+          onValidate={onValidate as ((value: MultipleChoiceAnswer) => string[]) | undefined}
           onVeto={onVeto}
           disabled={disabled}
           readOnly={readOnly}

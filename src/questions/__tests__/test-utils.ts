@@ -50,7 +50,7 @@ export const createMockMultipleChoiceQuestion = (
     { id: 'opt2', label: 'Option 2' },
   ],
   multiple: false,
-  showOther: false,
+  allowAdditionalText: false,
   ...overrides,
 });
 

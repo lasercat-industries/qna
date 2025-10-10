@@ -88,20 +88,21 @@ export interface MultipleChoiceOption {
   image?: string;
 }
 
-export type OtherOptionMode = 'exclusive' | 'additional';
+export type AdditionalTextMode = 'exclusive' | 'additional';
 
 export interface MultipleChoiceAnswer {
   selectedChoices: string[];
-  otherText?: string;
+  additionalText?: string;
 }
 
-export interface MultipleChoiceQuestion extends Question<string | string[] | MultipleChoiceAnswer> {
+export interface MultipleChoiceQuestion extends Question<MultipleChoiceAnswer> {
   type: 'multiple-choice';
   options: MultipleChoiceOption[];
   multiple: boolean;
-  showOther: boolean;
-  otherLabel?: string;
-  otherOptionMode?: OtherOptionMode;
+  allowAdditionalText: boolean;
+  additionalTextMode?: AdditionalTextMode;
+  additionalTextLabel?: string;
+  additionalTextPlaceholder?: string;
   columns?: number;
 }
 

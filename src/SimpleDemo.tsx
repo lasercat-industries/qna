@@ -24,7 +24,7 @@ const SimpleDemo: React.FC = () => {
       id: 'skills',
       type: 'multiple-choice',
       text: 'What programming languages do you know?',
-      description: 'Select all that apply. You can also add custom languages using "Other".',
+      description: 'Select options AND provide additional text - both work together!',
       required: true,
       priority: 'high',
       tags: ['technical'],
@@ -35,28 +35,29 @@ const SimpleDemo: React.FC = () => {
         { id: 'java', label: 'Java' },
       ],
       multiple: true,
-      showOther: true,
-      otherLabel: 'Other languages',
-      otherOptionMode: 'additional', // Can select "Other" alongside regular options
+      allowAdditionalText: true,
+      additionalTextMode: 'additional',
+      additionalTextLabel: 'Any other languages or frameworks?',
+      additionalTextPlaceholder: 'e.g., Rust, Go, React, Vue...',
     },
     {
-      id: 'primary-lang',
+      id: 'primary-tool',
       type: 'multiple-choice',
-      text: 'What is your PRIMARY programming language?',
-      description: 'Select only one. Choosing "Other" will deselect other options.',
+      text: 'What is your PRIMARY development tool?',
+      description: 'Select ONE from the list OR type a custom answer (exclusive mode)',
       required: true,
       priority: 'high',
       tags: ['technical'],
       options: [
-        { id: 'js', label: 'JavaScript' },
-        { id: 'ts', label: 'TypeScript' },
-        { id: 'py', label: 'Python' },
-        { id: 'java', label: 'Java' },
+        { id: 'vscode', label: 'VS Code' },
+        { id: 'intellij', label: 'IntelliJ IDEA' },
+        { id: 'vim', label: 'Vim/Neovim' },
       ],
       multiple: true,
-      showOther: true,
-      otherLabel: 'Other language',
-      otherOptionMode: 'exclusive', // Selecting "Other" clears all other selections
+      allowAdditionalText: true,
+      additionalTextMode: 'exclusive',
+      additionalTextLabel: 'Or enter a different tool',
+      additionalTextPlaceholder: 'e.g., Sublime Text, Emacs...',
     },
     {
       id: 'age',
@@ -103,10 +104,7 @@ const SimpleDemo: React.FC = () => {
       case 'long-form':
         return '';
       case 'multiple-choice':
-        if (question.showOther) {
-          return { selectedChoices: [], otherText: '' };
-        }
-        return question.multiple ? [] : '';
+        return { selectedChoices: [], additionalText: '' };
       case 'true-false':
         return false;
       case 'slider':
@@ -156,12 +154,12 @@ const SimpleDemo: React.FC = () => {
         case 'long-form':
           return typeof value === 'string' && value.trim().length > 0;
         case 'multiple-choice':
-          // Handle new MultipleChoiceAnswer format
+          // MultipleChoiceAnswer format
           if (typeof value === 'object' && value !== null && 'selectedChoices' in value) {
             const multiChoiceVal = value as { selectedChoices: string[] };
             return multiChoiceVal.selectedChoices.length > 0;
           }
-          return Array.isArray(value) ? value.length > 0 : !!value;
+          return false;
         case 'true-false':
           return response.timestamp.getTime() > 0; // Has been interacted with
         case 'numeric':

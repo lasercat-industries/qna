@@ -73,14 +73,14 @@ describe('Question Types', () => {
         { id: 'py', label: 'Python' },
       ],
       multiple: true,
-      showOther: true,
-      otherLabel: 'Other skill',
+      allowAdditionalText: true,
+      additionalTextLabel: 'Other skills',
     };
 
     expect(question.type).toBe('multiple-choice');
     expect(question.options).toHaveLength(3);
     expect(question.multiple).toBe(true);
-    expect(question.showOther).toBe(true);
+    expect(question.allowAdditionalText).toBe(true);
   });
 
   test('Slider question structure', () => {
@@ -240,7 +240,7 @@ describe('ConditionalLogicEngine', () => {
           { id: 'angular', label: 'Angular' },
         ],
         multiple: true,
-        showOther: false,
+        allowAdditionalText: false,
       },
       {
         id: 'react-version',
