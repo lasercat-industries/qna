@@ -119,7 +119,9 @@ export const TrueFalse: React.FC<QuestionComponentProps<boolean>> = ({
           disabled={disabled || readOnly}
           className="h-4 w-4 text-green-600 border-gray-300 focus:ring-green-500"
         />
-        <span className={`ml-2 ${localValue === true ? 'font-medium text-green-700' : 'text-gray-700'}`}>
+        <span
+          className={`ml-2 ${localValue === true ? 'font-medium text-green-700' : 'text-gray-700'}`}
+        >
           {trueLabel}
         </span>
       </label>
@@ -132,7 +134,9 @@ export const TrueFalse: React.FC<QuestionComponentProps<boolean>> = ({
           disabled={disabled || readOnly}
           className="h-4 w-4 text-red-600 border-gray-300 focus:ring-red-500"
         />
-        <span className={`ml-2 ${localValue === false ? 'font-medium text-red-700' : 'text-gray-700'}`}>
+        <span
+          className={`ml-2 ${localValue === false ? 'font-medium text-red-700' : 'text-gray-700'}`}
+        >
           {falseLabel}
         </span>
       </label>

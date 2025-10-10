@@ -3,10 +3,13 @@ import type {
   MultipleChoiceQuestion,
   MultipleChoiceOption,
   QuestionComponentProps,
+  MultipleChoiceAnswer,
 } from '../types';
 import QuestionWrapper from '../core/QuestionWrapper';
 
-export const MultipleChoice: React.FC<QuestionComponentProps<string | string[]>> = ({
+export const MultipleChoice: React.FC<
+  QuestionComponentProps<string | string[] | MultipleChoiceAnswer>
+> = ({
   question,
   value = '',
   onChange,
@@ -17,86 +20,140 @@ export const MultipleChoice: React.FC<QuestionComponentProps<string | string[]>>
   className = '',
 }) => {
   const q = question as MultipleChoiceQuestion;
-  const [localValue, setLocalValue] = useState<string | string[]>(
-    q.multiple ? (Array.isArray(value) ? value : []) : (value as string),
-  );
-  const [showOtherInput, setShowOtherInput] = useState(false);
-  const [otherValue, setOtherValue] = useState('');
+  const otherOptionMode = q.otherOptionMode || 'exclusive';
+
+  // Parse initial value
+  const parseValue = (val: string | string[] | MultipleChoiceAnswer) => {
+    if (typeof val === 'object' && val !== null && 'selectedChoices' in val) {
+      return {
+        selectedChoices: val.selectedChoices || [],
+        otherText: val.otherText || '',
+      };
+    }
+
+    // Legacy format support
+    if (Array.isArray(val)) {
+      const otherItem = val.find((v) => v.startsWith('other:'));
+      const selectedChoices = val.filter((v) => v !== 'other' && !v.startsWith('other:'));
+      return {
+        selectedChoices: otherItem ? [...selectedChoices, 'other'] : selectedChoices,
+        otherText: otherItem ? otherItem.substring(6) : '',
+      };
+    }
+
+    if (typeof val === 'string') {
+      if (val.startsWith('other:')) {
+        return { selectedChoices: ['other'], otherText: val.substring(6) };
+      }
+      return { selectedChoices: val ? [val] : [], otherText: '' };
+    }
+
+    return { selectedChoices: [], otherText: '' };
+  };
+
+  const initialParsed = parseValue(value);
+  const [selectedChoices, setSelectedChoices] = useState<string[]>(initialParsed.selectedChoices);
+  const [otherText, setOtherText] = useState(initialParsed.otherText);
 
   useEffect(() => {
-    if (q.multiple) {
-      setLocalValue(Array.isArray(value) ? value : []);
+    const parsed = parseValue(value);
+    setSelectedChoices(parsed.selectedChoices);
+    setOtherText(parsed.otherText);
+  }, [value]);
+
+  const emitChange = (choices: string[], text: string) => {
+    if (q.showOther && choices.includes('other')) {
+      // New format with structured answer
+      const answer: MultipleChoiceAnswer = {
+        selectedChoices: choices,
+        otherText: text,
+      };
+      onChange(answer as string | string[] | MultipleChoiceAnswer);
     } else {
-      setLocalValue(value as string);
-    }
-
-    if (q.showOther) {
-      const isOtherSelected = q.multiple
-        ? Array.isArray(value) && value.includes('other')
-        : value === 'other';
-      setShowOtherInput(isOtherSelected);
-
-      if (isOtherSelected && typeof value === 'string' && value.startsWith('other:')) {
-        setOtherValue(value.substring(6));
+      // Legacy format for backward compatibility
+      if (q.multiple) {
+        onChange(choices as string | string[] | MultipleChoiceAnswer);
+      } else {
+        onChange((choices[0] || '') as string | string[] | MultipleChoiceAnswer);
       }
-    }
-  }, [value, q.multiple, q.showOther]);
-
-  const handleSingleChange = (optionId: string) => {
-    if (optionId === 'other' && q.showOther) {
-      setShowOtherInput(true);
-      setLocalValue('other');
-      onChange('other');
-    } else {
-      setShowOtherInput(false);
-      setLocalValue(optionId);
-      onChange(optionId);
     }
   };
 
-  const handleMultipleChange = (optionId: string) => {
-    const currentValues = Array.isArray(localValue) ? localValue : [];
-    let newValues: string[];
+  const handleOptionChange = (optionId: string) => {
+    if (optionId === 'other') {
+      handleOtherChange();
+      return;
+    }
 
-    if (optionId === 'other' && q.showOther) {
-      if (currentValues.includes('other')) {
-        setShowOtherInput(false);
-        newValues = currentValues.filter((v) => v !== 'other');
+    let newChoices: string[];
+
+    if (q.multiple) {
+      if (selectedChoices.includes(optionId)) {
+        newChoices = selectedChoices.filter((v) => v !== optionId);
       } else {
-        setShowOtherInput(true);
-        newValues = [...currentValues, 'other'];
+        newChoices = [...selectedChoices, optionId];
+
+        // If exclusive mode and other is selected, deselect other
+        if (otherOptionMode === 'exclusive' && selectedChoices.includes('other')) {
+          newChoices = newChoices.filter((v) => v !== 'other');
+          setOtherText('');
+        }
       }
     } else {
-      if (currentValues.includes(optionId)) {
-        newValues = currentValues.filter((v) => v !== optionId);
-      } else {
-        newValues = [...currentValues, optionId];
+      newChoices = [optionId];
+      // Clear other text when selecting a different option
+      if (selectedChoices.includes('other')) {
+        setOtherText('');
       }
     }
 
-    setLocalValue(newValues);
-    onChange(newValues);
+    setSelectedChoices(newChoices);
+    emitChange(newChoices, otherText);
+  };
+
+  const handleOtherChange = () => {
+    let newChoices: string[];
+
+    if (q.multiple) {
+      if (selectedChoices.includes('other')) {
+        // Deselecting other
+        newChoices = selectedChoices.filter((v) => v !== 'other');
+        setOtherText('');
+        setSelectedChoices(newChoices);
+        emitChange(newChoices, '');
+      } else {
+        // Selecting other
+        if (otherOptionMode === 'exclusive') {
+          // Clear all other selections
+          newChoices = ['other'];
+        } else {
+          // Keep other selections
+          newChoices = [...selectedChoices, 'other'];
+        }
+        setSelectedChoices(newChoices);
+        emitChange(newChoices, otherText);
+      }
+    } else {
+      // Single select
+      if (selectedChoices.includes('other')) {
+        newChoices = [];
+        setOtherText('');
+      } else {
+        newChoices = ['other'];
+      }
+      setSelectedChoices(newChoices);
+      emitChange(newChoices, otherText);
+    }
   };
 
   const handleOtherInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newOtherValue = e.target.value;
-    setOtherValue(newOtherValue);
-
-    if (q.multiple) {
-      const currentValues = Array.isArray(localValue) ? localValue : [];
-      const filteredValues = currentValues.filter((v) => !v.startsWith('other'));
-      onChange([...filteredValues, `other:${newOtherValue}`]);
-    } else {
-      onChange(`other:${newOtherValue}`);
-    }
+    setOtherText(newOtherValue);
+    emitChange(selectedChoices, newOtherValue);
   };
 
   const isOptionSelected = (optionId: string): boolean => {
-    if (q.multiple) {
-      return Array.isArray(localValue) && localValue.includes(optionId);
-    } else {
-      return localValue === optionId;
-    }
+    return selectedChoices.includes(optionId);
   };
 
   const renderOption = (option: MultipleChoiceOption) => {
@@ -121,9 +178,7 @@ export const MultipleChoice: React.FC<QuestionComponentProps<string | string[]>>
           name={`question-${question.id}`}
           type={inputType}
           value={option.id}
-          onChange={() =>
-            q.multiple ? handleMultipleChange(option.id) : handleSingleChange(option.id)
-          }
+          onChange={() => handleOptionChange(option.id)}
         />
         <div className="flex-1">
           {option.image && (
@@ -145,14 +200,16 @@ export const MultipleChoice: React.FC<QuestionComponentProps<string | string[]>>
   const gridColumns = q.columns || (q.options.length <= 2 ? 1 : 2);
   const gridClass = `grid-cols-${gridColumns}`;
 
+  const showOtherInput = q.showOther && selectedChoices.includes('other');
+
   return (
-    <QuestionWrapper<string | string[]>
+    <QuestionWrapper<string | string[] | MultipleChoiceAnswer>
       className={className}
       disabled={disabled}
       error={error}
       question={question}
       readOnly={readOnly}
-      value={localValue}
+      value={value}
       onChange={onChange}
       onValidate={onValidate}
     >
@@ -177,12 +234,17 @@ export const MultipleChoice: React.FC<QuestionComponentProps<string | string[]>>
                 name={`question-${question.id}`}
                 type={q.multiple ? 'checkbox' : 'radio'}
                 value="other"
-                onChange={() =>
-                  q.multiple ? handleMultipleChange('other') : handleSingleChange('other')
-                }
+                onChange={handleOtherChange}
               />
               <div className="flex-1">
                 <div className="font-medium">{q.otherLabel || 'Other'}</div>
+                {q.otherOptionMode && (
+                  <div className="text-xs text-gray-500 mt-0.5">
+                    {q.otherOptionMode === 'exclusive'
+                      ? 'Selecting this will deselect other options'
+                      : 'Can be selected with other options'}
+                  </div>
+                )}
               </div>
             </label>
           )}
@@ -198,7 +260,7 @@ export const MultipleChoice: React.FC<QuestionComponentProps<string | string[]>>
             disabled={disabled || readOnly}
             placeholder="Please specify..."
             type="text"
-            value={otherValue}
+            value={otherText}
             onChange={handleOtherInputChange}
           />
         )}

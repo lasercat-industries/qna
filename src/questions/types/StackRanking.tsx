@@ -28,10 +28,11 @@ export const StackRanking: React.FC<QuestionComponentProps<string[]>> = ({
       // Add any missing items at the end
       const missingItems = q.items.filter((item) => !value.includes(item.id));
       const newItems = [...orderedItems, ...missingItems];
-      
+
       // Only update if the items have actually changed
-      setItems(prevItems => {
-        const hasChanged = prevItems.length !== newItems.length ||
+      setItems((prevItems) => {
+        const hasChanged =
+          prevItems.length !== newItems.length ||
           prevItems.some((item, index) => item.id !== newItems[index]?.id);
         return hasChanged ? newItems : prevItems;
       });
@@ -39,7 +40,7 @@ export const StackRanking: React.FC<QuestionComponentProps<string[]>> = ({
       // Only set initial items if we don't have any yet
       setItems([...q.items]);
     }
-  }, [value?.join(','), q.items.map(i => i.id).join(',')]);
+  }, [value?.join(','), q.items.map((i) => i.id).join(',')]);
 
   const handleDragStart = (e: React.DragEvent, itemId: string) => {
     if (disabled || readOnly) return;

@@ -148,4 +148,4 @@ bun.lockb
 .DS_Store
 
 # Build
-dist
+dist/

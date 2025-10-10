@@ -21,6 +21,44 @@ const SimpleDemo: React.FC = () => {
       maxLength: 100,
     },
     {
+      id: 'skills',
+      type: 'multiple-choice',
+      text: 'What programming languages do you know?',
+      description: 'Select all that apply. You can also add custom languages using "Other".',
+      required: true,
+      priority: 'high',
+      tags: ['technical'],
+      options: [
+        { id: 'js', label: 'JavaScript' },
+        { id: 'ts', label: 'TypeScript' },
+        { id: 'py', label: 'Python' },
+        { id: 'java', label: 'Java' },
+      ],
+      multiple: true,
+      showOther: true,
+      otherLabel: 'Other languages',
+      otherOptionMode: 'additional', // Can select "Other" alongside regular options
+    },
+    {
+      id: 'primary-lang',
+      type: 'multiple-choice',
+      text: 'What is your PRIMARY programming language?',
+      description: 'Select only one. Choosing "Other" will deselect other options.',
+      required: true,
+      priority: 'high',
+      tags: ['technical'],
+      options: [
+        { id: 'js', label: 'JavaScript' },
+        { id: 'ts', label: 'TypeScript' },
+        { id: 'py', label: 'Python' },
+        { id: 'java', label: 'Java' },
+      ],
+      multiple: true,
+      showOther: true,
+      otherLabel: 'Other language',
+      otherOptionMode: 'exclusive', // Selecting "Other" clears all other selections
+    },
+    {
       id: 'age',
       type: 'numeric',
       text: 'What is your age?',
@@ -65,13 +103,16 @@ const SimpleDemo: React.FC = () => {
       case 'long-form':
         return '';
       case 'multiple-choice':
+        if (question.showOther) {
+          return { selectedChoices: [], otherText: '' };
+        }
         return question.multiple ? [] : '';
       case 'true-false':
         return false;
       case 'slider':
         return question.dual ? [question.min, question.max] : question.min;
       case 'stack-ranking':
-        return question.items.map(item => item.id);
+        return question.items.map((item) => item.id);
       case 'numeric':
         return 0;
       default:
@@ -82,7 +123,7 @@ const SimpleDemo: React.FC = () => {
   // Initialize responses with default values for all questions
   useEffect(() => {
     const initialResponses: Record<string, QuestionResponse> = {};
-    questions.forEach(question => {
+    questions.forEach((question) => {
       if (!responses[question.id]) {
         initialResponses[question.id] = {
           questionId: question.id,
@@ -93,28 +134,33 @@ const SimpleDemo: React.FC = () => {
         };
       }
     });
-    
+
     if (Object.keys(initialResponses).length > 0) {
-      setResponses(prev => ({ ...initialResponses, ...prev }));
+      setResponses((prev) => ({ ...initialResponses, ...prev }));
     }
   }, []);
 
   // Validate form whenever responses change
   useEffect(() => {
-    const requiredQuestions = questions.filter(q => q.required);
-    const allRequiredAnswered = requiredQuestions.every(question => {
+    const requiredQuestions = questions.filter((q) => q.required);
+    const allRequiredAnswered = requiredQuestions.every((question) => {
       const response = responses[question.id];
       if (!response) return false;
       if (vetoedQuestions.has(question.id)) return true; // Vetoed questions count as answered
-      
+
       const value = response.value;
-      
+
       // Check if value is actually provided (not just default)
       switch (question.type) {
         case 'short-answer':
         case 'long-form':
           return typeof value === 'string' && value.trim().length > 0;
         case 'multiple-choice':
+          // Handle new MultipleChoiceAnswer format
+          if (typeof value === 'object' && value !== null && 'selectedChoices' in value) {
+            const multiChoiceVal = value as { selectedChoices: string[] };
+            return multiChoiceVal.selectedChoices.length > 0;
+          }
           return Array.isArray(value) ? value.length > 0 : !!value;
         case 'true-false':
           return response.timestamp.getTime() > 0; // Has been interacted with
@@ -128,12 +174,12 @@ const SimpleDemo: React.FC = () => {
           return false;
       }
     });
-    
+
     setIsValid(allRequiredAnswered);
   }, [responses, vetoedQuestions]);
 
   const handleQuestionChange = (questionId: string, value: unknown) => {
-    setResponses(prev => ({
+    setResponses((prev) => ({
       ...prev,
       [questionId]: {
         questionId,
@@ -146,7 +192,7 @@ const SimpleDemo: React.FC = () => {
   };
 
   const handleVeto = (questionId: string, vetoed: boolean, reason?: string) => {
-    setVetoedQuestions(prev => {
+    setVetoedQuestions((prev) => {
       const newSet = new Set(prev);
       if (vetoed) {
         newSet.add(questionId);
@@ -155,12 +201,13 @@ const SimpleDemo: React.FC = () => {
       }
       return newSet;
     });
-    
-    setResponses(prev => ({
+
+    setResponses((prev) => ({
       ...prev,
       [questionId]: {
         questionId,
-        value: prev[questionId]?.value ?? getDefaultValue(questions.find(q => q.id === questionId)!),
+        value:
+          prev[questionId]?.value ?? getDefaultValue(questions.find((q) => q.id === questionId)!),
         timestamp: prev[questionId]?.timestamp ?? new Date(),
         valid: prev[questionId]?.valid ?? true,
         errors: prev[questionId]?.errors ?? [],
@@ -178,7 +225,7 @@ const SimpleDemo: React.FC = () => {
 
     // Include all responses, even for untouched optional questions
     const completeResponses: Record<string, QuestionResponse> = {};
-    questions.forEach(question => {
+    questions.forEach((question) => {
       const response = responses[question.id];
       if (response) {
         completeResponses[question.id] = response;
@@ -202,10 +249,10 @@ const SimpleDemo: React.FC = () => {
     setResponses({});
     setVetoedQuestions(new Set());
     setSubmitted(false);
-    
+
     // Reinitialize with defaults
     const initialResponses: Record<string, QuestionResponse> = {};
-    questions.forEach(question => {
+    questions.forEach((question) => {
       initialResponses[question.id] = {
         questionId: question.id,
         value: getDefaultValue(question),
@@ -223,20 +270,30 @@ const SimpleDemo: React.FC = () => {
         <div className="max-w-2xl mx-auto px-4">
           <div className="bg-white rounded-lg shadow-md p-8 text-center">
             <div className="mb-4">
-              <svg className="w-16 h-16 text-green-500 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              <svg
+                className="w-16 h-16 text-green-500 mx-auto"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
               </svg>
             </div>
             <h2 className="text-2xl font-bold text-gray-900 mb-2">Thank You!</h2>
             <p className="text-gray-600 mb-6">Your responses have been submitted successfully.</p>
-            
+
             <div className="bg-gray-50 rounded p-4 mb-6 text-left">
               <h3 className="font-semibold mb-2">Submitted Data:</h3>
               <pre className="text-xs overflow-auto max-h-60">
                 {JSON.stringify(responses, null, 2)}
               </pre>
             </div>
-            
+
             <button
               onClick={handleReset}
               className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
@@ -261,7 +318,7 @@ const SimpleDemo: React.FC = () => {
 
         <div className="bg-white rounded-lg shadow-md p-6">
           <div className="space-y-6">
-            {questions.map(question => (
+            {questions.map((question) => (
               <QuestionRenderer
                 key={question.id}
                 question={question}

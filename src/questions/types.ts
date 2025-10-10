@@ -9,7 +9,13 @@ export type QuestionType =
 
 export type Priority = 'low' | 'medium' | 'high' | 'critical';
 
-export type PriorityDisplayStyle = 'border-left' | 'border-all' | 'background' | 'chip' | 'dot' | 'none';
+export type PriorityDisplayStyle =
+  | 'border-left'
+  | 'border-all'
+  | 'background'
+  | 'chip'
+  | 'dot'
+  | 'none';
 
 export type ConditionOperator =
   | 'equals'
@@ -82,12 +88,20 @@ export interface MultipleChoiceOption {
   image?: string;
 }
 
-export interface MultipleChoiceQuestion extends Question<string | string[]> {
+export type OtherOptionMode = 'exclusive' | 'additional';
+
+export interface MultipleChoiceAnswer {
+  selectedChoices: string[];
+  otherText?: string;
+}
+
+export interface MultipleChoiceQuestion extends Question<string | string[] | MultipleChoiceAnswer> {
   type: 'multiple-choice';
   options: MultipleChoiceOption[];
   multiple: boolean;
   showOther: boolean;
   otherLabel?: string;
+  otherOptionMode?: OtherOptionMode;
   columns?: number;
 }
 

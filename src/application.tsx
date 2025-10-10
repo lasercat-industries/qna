@@ -88,7 +88,7 @@ const QuestionsDemo: React.FC = () => {
       tags: ['preferences'],
       trueLabel: 'Yes, I prefer remote',
       falseLabel: 'No, I prefer in-office',
-      displayStyle: 'toggle',  // Use toggle switch style
+      displayStyle: 'toggle', // Use toggle switch style
     },
     {
       id: 'remote-experience',
@@ -214,11 +214,11 @@ const QuestionsDemo: React.FC = () => {
       description: 'Required for form submission',
       required: true,
       priority: 'critical',
-      priorityDisplayStyle: 'chip',  // Display as chip badge
+      priorityDisplayStyle: 'chip', // Display as chip badge
       tags: ['legal'],
       trueLabel: 'I agree',
       falseLabel: 'I do not agree',
-      displayStyle: 'buttons',  // Use button style
+      displayStyle: 'buttons', // Use button style
     },
     {
       id: 'newsletter',
@@ -227,11 +227,11 @@ const QuestionsDemo: React.FC = () => {
       description: 'Optional - Get updates about new opportunities',
       required: false,
       priority: 'low',
-      priorityDisplayStyle: 'background',  // Display as background color
+      priorityDisplayStyle: 'background', // Display as background color
       tags: ['marketing'],
       trueLabel: 'Yes, subscribe me',
       falseLabel: 'No thanks',
-      displayStyle: 'radio',  // Use radio button style
+      displayStyle: 'radio', // Use radio button style
     },
     {
       id: 'referral',
@@ -240,10 +240,10 @@ const QuestionsDemo: React.FC = () => {
       placeholder: 'e.g., Google, Friend, LinkedIn',
       required: false,
       priority: 'low',
-      priorityDisplayStyle: 'border-all',  // Display as full border
+      priorityDisplayStyle: 'border-all', // Display as full border
       tags: ['marketing'],
       maxLength: 200,
-      allowVeto: true,  // Allow users to veto this question
+      allowVeto: true, // Allow users to veto this question
       vetoLabel: 'This question feels irrelevant',
     },
     {
@@ -252,13 +252,13 @@ const QuestionsDemo: React.FC = () => {
       text: 'How soon do you need a response?',
       required: true,
       priority: 'high' as Priority,
-      priorityDisplayStyle: 'background',  // Default left border style
+      priorityDisplayStyle: 'background', // Default left border style
       tags: ['timing'],
       options: [
         { id: 'asap', label: 'ASAP', description: 'Within 24 hours' },
         { id: 'week', label: 'This week', description: 'Within 7 days' },
         { id: 'month', label: 'This month', description: 'Within 30 days' },
-        { id: 'flexible', label: 'I\'m flexible', description: 'No rush' },
+        { id: 'flexible', label: "I'm flexible", description: 'No rush' },
       ],
       multiple: false,
       showOther: false,
@@ -367,17 +367,17 @@ const QuestionsDemo: React.FC = () => {
   const handleSubmit = () => {
     // Check if all required questions are answered
     const allQuestions = [...sampleQuestions, ...individualQuestions];
-    const requiredQuestions = allQuestions.filter(q => q.required && visibleQuestions.has(q.id));
-    
-    const unansweredRequired = requiredQuestions.filter(question => {
+    const requiredQuestions = allQuestions.filter((q) => q.required && visibleQuestions.has(q.id));
+
+    const unansweredRequired = requiredQuestions.filter((question) => {
       const response = formState.responses[question.id];
       if (!response) return true;
-      
+
       // Check if vetoed (counts as answered)
       if (response.vetoed) return false;
-      
+
       const value = response.value;
-      
+
       // Check if value is actually provided
       switch (question.type) {
         case 'short-answer':
@@ -397,17 +397,19 @@ const QuestionsDemo: React.FC = () => {
           return true;
       }
     });
-    
+
     if (unansweredRequired.length > 0) {
-      alert(`Please answer all required questions:\n${unansweredRequired.map(q => `- ${q.text}`).join('\n')}`);
+      alert(
+        `Please answer all required questions:\n${unansweredRequired.map((q) => `- ${q.text}`).join('\n')}`,
+      );
       return;
     }
-    
+
     setFormState((prev) => ({ ...prev, isSubmitting: true }));
-    
+
     // Include default values for all untouched optional questions
     const completeResponses = { ...formState.responses };
-    allQuestions.forEach(question => {
+    allQuestions.forEach((question) => {
       if (!completeResponses[question.id] && visibleQuestions.has(question.id)) {
         let defaultValue: unknown;
         switch (question.type) {
@@ -425,7 +427,7 @@ const QuestionsDemo: React.FC = () => {
             defaultValue = question.dual ? [question.min, question.max] : question.min;
             break;
           case 'stack-ranking':
-            defaultValue = question.items.map(item => item.id);
+            defaultValue = question.items.map((item) => item.id);
             break;
           case 'numeric':
             defaultValue = 0;
@@ -433,7 +435,7 @@ const QuestionsDemo: React.FC = () => {
           default:
             defaultValue = null;
         }
-        
+
         completeResponses[question.id] = {
           questionId: question.id,
           value: defaultValue,
@@ -505,10 +507,12 @@ const QuestionsDemo: React.FC = () => {
           {/* Individual Questions (not in groups) */}
           <div className="bg-white rounded-lg shadow-md p-6">
             <h2 className="text-xl font-semibold text-gray-900 mb-4">Quick Questions</h2>
-            <p className="text-sm text-gray-600 mb-6">Please answer these initial questions before proceeding to the main form.</p>
+            <p className="text-sm text-gray-600 mb-6">
+              Please answer these initial questions before proceeding to the main form.
+            </p>
             <div className="space-y-4">
               {individualQuestions
-                .filter(q => visibleQuestions.has(q.id))
+                .filter((q) => visibleQuestions.has(q.id))
                 .map((question) => (
                   <div key={question.id}>
                     <QuestionRenderer
@@ -518,7 +522,7 @@ const QuestionsDemo: React.FC = () => {
                       disabled={formState.isSubmitting}
                     />
                   </div>
-              ))}
+                ))}
             </div>
           </div>
 

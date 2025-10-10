@@ -39,9 +39,9 @@ export const QuestionGroup: React.FC<QuestionGroupProps> = ({
   const [isExpanded, setIsExpanded] = useState(group.defaultExpanded ?? true);
   const [completedQuestions, setCompletedQuestions] = useState<Set<string>>(new Set());
   const [visibleQuestions, setVisibleQuestions] = useState<Set<string>>(new Set());
-  
+
   // Determine if group is required based on whether any questions are required
-  const isGroupRequired = group.questions.some(q => q.required);
+  const isGroupRequired = group.questions.some((q) => q.required);
 
   useEffect(() => {
     // Initialize all questions as visible
@@ -135,7 +135,7 @@ export const QuestionGroup: React.FC<QuestionGroupProps> = ({
               Optional
             </span>
           )}
-          
+
           {group.tags.length > 0 && (
             <div className="flex gap-1">
               {group.tags.map((tag) => (

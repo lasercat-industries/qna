@@ -1,6 +1,6 @@
 {
   "name": "@lasercat/qna",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "description": "A TypeScript-native library template with bun",
   "author": "Ryland Goldstein",
   "license": "MIT",
@@ -80,5 +80,10 @@
     "react-dom": "^19.x",
     "react-router": "^7.x",
     "typescript": "^5.8.3"
+  },
+  "dependencies": {
+    "tree-sitter": "^0.25.0",
+    "tree-sitter-javascript": "^0.25.0",
+    "tree-sitter-typescript": "^0.23.2"
   }
 }

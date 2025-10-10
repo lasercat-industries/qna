@@ -15,11 +15,22 @@ interface QuestionWrapperProps<T = unknown> {
   vetoed?: boolean;
 }
 
-const getPriorityColor = (priority: Priority, style: PriorityDisplayStyle = 'border-left'): string => {
+const getPriorityColor = (
+  priority: Priority,
+  style: PriorityDisplayStyle = 'border-left',
+): string => {
   const colors = {
     critical: { border: 'border-red-500', bg: 'bg-red-50', chip: 'bg-red-100 text-red-700' },
-    high: { border: 'border-orange-500', bg: 'bg-orange-50', chip: 'bg-orange-100 text-orange-700' },
-    medium: { border: 'border-yellow-500', bg: 'bg-yellow-50', chip: 'bg-yellow-100 text-yellow-700' },
+    high: {
+      border: 'border-orange-500',
+      bg: 'bg-orange-50',
+      chip: 'bg-orange-100 text-orange-700',
+    },
+    medium: {
+      border: 'border-yellow-500',
+      bg: 'bg-yellow-50',
+      chip: 'bg-yellow-100 text-yellow-700',
+    },
     low: { border: 'border-gray-300', bg: 'bg-gray-50', chip: 'bg-gray-100 text-gray-700' },
   };
 
@@ -29,7 +40,7 @@ const getPriorityColor = (priority: Priority, style: PriorityDisplayStyle = 'bor
     case 'border-left':
       return `border-l-4 ${colorSet.border}`;
     case 'border-all':
-      return '';  // Handled at wrapper level
+      return ''; // Handled at wrapper level
     case 'background':
       return colorSet.bg;
     case 'chip':
@@ -116,7 +127,16 @@ export function QuestionWrapper<T = unknown>({
       for (const rule of question.validation) {
         switch (rule.type) {
           case 'required':
-            if (!val || (typeof val === 'string' && !val.trim())) {
+            // Handle MultipleChoiceAnswer type
+            if (typeof val === 'object' && val !== null && 'selectedChoices' in val) {
+              const multiChoiceVal = val as { selectedChoices: string[] };
+              const choices = multiChoiceVal.selectedChoices;
+              if (!choices || choices.length === 0) {
+                errors.push(rule.message || 'This field is required');
+              }
+            } else if (!val || (typeof val === 'string' && !val.trim())) {
+              errors.push(rule.message || 'This field is required');
+            } else if (Array.isArray(val) && val.length === 0) {
               errors.push(rule.message || 'This field is required');
             }
             break;
@@ -128,7 +148,14 @@ export function QuestionWrapper<T = unknown>({
               if (typeof val === 'string' && val.length < rule.value) {
                 errors.push(rule.message || `Must be at least ${rule.value} characters`);
               }
-              if (Array.isArray(val) && val.length < rule.value) {
+              // Handle MultipleChoiceAnswer type
+              if (typeof val === 'object' && val !== null && 'selectedChoices' in val) {
+                const multiChoiceVal = val as { selectedChoices: string[] };
+                const choices = multiChoiceVal.selectedChoices;
+                if (choices.length < rule.value) {
+                  errors.push(rule.message || `Select at least ${rule.value} items`);
+                }
+              } else if (Array.isArray(val) && val.length < rule.value) {
                 errors.push(rule.message || `Select at least ${rule.value} items`);
               }
             }
@@ -141,7 +168,14 @@ export function QuestionWrapper<T = unknown>({
               if (typeof val === 'string' && val.length > rule.value) {
                 errors.push(rule.message || `Must be at most ${rule.value} characters`);
               }
-              if (Array.isArray(val) && val.length > rule.value) {
+              // Handle MultipleChoiceAnswer type
+              if (typeof val === 'object' && val !== null && 'selectedChoices' in val) {
+                const multiChoiceVal = val as { selectedChoices: string[] };
+                const choices = multiChoiceVal.selectedChoices;
+                if (choices.length > rule.value) {
+                  errors.push(rule.message || `Select at most ${rule.value} items`);
+                }
+              } else if (Array.isArray(val) && val.length > rule.value) {
                 errors.push(rule.message || `Select at most ${rule.value} items`);
               }
             }
@@ -186,7 +220,7 @@ export function QuestionWrapper<T = unknown>({
   const error = externalError || internalError;
   const showError = error && touched;
   const isDisabled = disabled || readOnly || isVetoed;
-  
+
   const handleVetoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newVetoed = e.target.checked;
     setIsVetoed(newVetoed);
@@ -226,16 +260,16 @@ export function QuestionWrapper<T = unknown>({
           </span>
         )}
         <div className="flex-1">
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            {question.text}
-          </label>
+          <label className="block text-sm font-medium text-gray-700 mb-1">{question.text}</label>
           {question.description && (
             <p className="text-sm text-gray-600 mb-2">{question.description}</p>
           )}
         </div>
         <div className="flex gap-1 flex-wrap">
           {priorityStyle === 'chip' && (
-            <span className={`px-2 py-1 text-xs rounded-full border ${getPriorityChipClass(question.priority)}`}>
+            <span
+              className={`px-2 py-1 text-xs rounded-full border ${getPriorityChipClass(question.priority)}`}
+            >
               {question.priority.toUpperCase()}
             </span>
           )}
@@ -244,11 +278,13 @@ export function QuestionWrapper<T = unknown>({
               Required
             </span>
           )}
-          {question.tags && question.tags.length > 0 && question.tags.map((tag) => (
-            <span key={tag} className="px-2 py-1 text-xs bg-gray-100 text-gray-600 rounded-full">
-              {tag}
-            </span>
-          ))}
+          {question.tags &&
+            question.tags.length > 0 &&
+            question.tags.map((tag) => (
+              <span key={tag} className="px-2 py-1 text-xs bg-gray-100 text-gray-600 rounded-full">
+                {tag}
+              </span>
+            ))}
         </div>
       </div>
 

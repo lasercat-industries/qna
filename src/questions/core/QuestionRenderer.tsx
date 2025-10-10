@@ -9,6 +9,7 @@ import type {
   SliderQuestion,
   StackRankingQuestion,
   NumericQuestion,
+  MultipleChoiceAnswer,
 } from '../types';
 import ShortAnswer from '../types/ShortAnswer';
 import LongForm from '../types/LongForm';
@@ -73,9 +74,13 @@ export const QuestionRenderer: React.FC<QuestionRendererProps> = ({
       return (
         <MultipleChoice
           question={question as MultipleChoiceQuestion}
-          value={value as (string | string[]) | undefined}
-          onChange={onChange as (value: string | string[]) => void}
-          onValidate={onValidate as ((value: string | string[]) => string[]) | undefined}
+          value={value as (string | string[] | MultipleChoiceAnswer) | undefined}
+          onChange={onChange as (value: string | string[] | MultipleChoiceAnswer) => void}
+          onValidate={
+            onValidate as
+              | ((value: string | string[] | MultipleChoiceAnswer) => string[])
+              | undefined
+          }
           onVeto={onVeto}
           disabled={disabled}
           readOnly={readOnly}
