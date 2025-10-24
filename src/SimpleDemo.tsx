@@ -6,7 +6,6 @@ const SimpleDemo: React.FC = () => {
   const [responses, setResponses] = useState<Record<string, QuestionResponse>>({});
   const [isValid, setIsValid] = useState(false);
   const [submitted, setSubmitted] = useState(false);
-  const [vetoedQuestions, setVetoedQuestions] = useState<Set<string>>(new Set());
 
   // Simple set of questions - no groups
   const questions: AnyQuestion[] = [
@@ -144,7 +143,7 @@ const SimpleDemo: React.FC = () => {
     const allRequiredAnswered = requiredQuestions.every((question) => {
       const response = responses[question.id];
       if (!response) return false;
-      if (vetoedQuestions.has(question.id)) return true; // Vetoed questions count as answered
+      if (response?.vetoed) return true; // Vetoed questions count as answered
 
       const value = response.value;
 
@@ -174,44 +173,12 @@ const SimpleDemo: React.FC = () => {
     });
 
     setIsValid(allRequiredAnswered);
-  }, [responses, vetoedQuestions]);
+  }, [responses]);
 
-  const handleQuestionChange = (questionId: string, value: unknown) => {
+  const handleChange = (response: QuestionResponse) => {
     setResponses((prev) => ({
       ...prev,
-      [questionId]: {
-        questionId,
-        value,
-        timestamp: new Date(),
-        valid: true,
-        errors: [],
-      },
-    }));
-  };
-
-  const handleVeto = (questionId: string, vetoed: boolean, reason?: string) => {
-    setVetoedQuestions((prev) => {
-      const newSet = new Set(prev);
-      if (vetoed) {
-        newSet.add(questionId);
-      } else {
-        newSet.delete(questionId);
-      }
-      return newSet;
-    });
-
-    setResponses((prev) => ({
-      ...prev,
-      [questionId]: {
-        questionId,
-        value:
-          prev[questionId]?.value ?? getDefaultValue(questions.find((q) => q.id === questionId)!),
-        timestamp: prev[questionId]?.timestamp ?? new Date(),
-        valid: prev[questionId]?.valid ?? true,
-        errors: prev[questionId]?.errors ?? [],
-        vetoed,
-        vetoReason: reason,
-      },
+      [response.questionId]: response,
     }));
   };
 
@@ -245,7 +212,6 @@ const SimpleDemo: React.FC = () => {
 
   const handleReset = () => {
     setResponses({});
-    setVetoedQuestions(new Set());
     setSubmitted(false);
 
     // Reinitialize with defaults
@@ -320,10 +286,8 @@ const SimpleDemo: React.FC = () => {
               <QuestionRenderer
                 key={question.id}
                 question={question}
-                value={responses[question.id]?.value}
-                onChange={(value) => handleQuestionChange(question.id, value)}
-                onVeto={(vetoed, reason) => handleVeto(question.id, vetoed, reason)}
-                vetoed={vetoedQuestions.has(question.id)}
+                response={responses[question.id]}
+                onChange={handleChange}
               />
             ))}
           </div>
@@ -360,7 +324,7 @@ const SimpleDemo: React.FC = () => {
           <div className="text-xs">
             <p>Valid: {isValid ? '✅' : '❌'}</p>
             <p>Responses: {Object.keys(responses).length}</p>
-            <p>Vetoed: {vetoedQuestions.size}</p>
+            <p>Vetoed: {Object.values(responses).filter((r) => r.vetoed).length}</p>
           </div>
         </div>
       </div>

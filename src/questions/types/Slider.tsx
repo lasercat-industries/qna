@@ -1,15 +1,14 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import type { SliderQuestion, QuestionComponentProps } from '../types';
+import type { SliderQuestion, QuestionComponentProps, QuestionResponse } from '../types';
 import QuestionWrapper from '../core/QuestionWrapper';
 
 export const Slider: React.FC<QuestionComponentProps<number | [number, number]>> = ({
   question,
-  value,
+  response,
   onChange,
   onValidate,
   disabled = false,
   readOnly = false,
-  error,
   className = '',
 }) => {
   const q = question as SliderQuestion;
@@ -17,18 +16,31 @@ export const Slider: React.FC<QuestionComponentProps<number | [number, number]>>
     () => (q.dual ? ([q.min, q.max] as [number, number]) : q.min),
     [q.dual, q.min, q.max],
   );
-  const [localValue, setLocalValue] = useState<number | [number, number]>(value ?? defaultValue);
+  const value = response?.value ?? defaultValue;
+  const [localValue, setLocalValue] = useState<number | [number, number]>(value);
   const [activeThumb, setActiveThumb] = useState<number | null>(null);
   const [inputValues, setInputValues] = useState<{ single?: string; dual?: [string, string] }>({});
 
   useEffect(() => {
-    setLocalValue(value ?? defaultValue);
-  }, [value, defaultValue]);
+    setLocalValue(value);
+  }, [value]);
+
+  const emitChange = (newValue: number | [number, number]) => {
+    onChange({
+      questionId: question.id,
+      value: newValue,
+      timestamp: new Date(),
+      valid: true,
+      errors: [],
+      vetoed: response?.vetoed,
+      vetoReason: response?.vetoReason,
+    });
+  };
 
   const handleSingleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = parseFloat(e.target.value);
     setLocalValue(newValue);
-    onChange(newValue);
+    emitChange(newValue);
   };
 
   const handleSingleInputChange = (inputValue: string) => {
@@ -42,7 +54,7 @@ export const Slider: React.FC<QuestionComponentProps<number | [number, number]>>
     const parsed = parseFloat(inputValue);
     if (!isNaN(parsed) && parsed >= q.min && parsed <= q.max) {
       setLocalValue(parsed);
-      onChange(parsed);
+      emitChange(parsed);
     }
     // Clear the input value to show the actual value
     setInputValues({ ...inputValues, single: undefined });
@@ -65,7 +77,7 @@ export const Slider: React.FC<QuestionComponentProps<number | [number, number]>>
     }
 
     setLocalValue(updated);
-    onChange(updated);
+    emitChange(updated);
   };
 
   const handleDualInputChange = (index: number, inputValue: string) => {
@@ -131,14 +143,13 @@ export const Slider: React.FC<QuestionComponentProps<number | [number, number]>>
       <QuestionWrapper<[number, number]>
         className={className}
         disabled={disabled}
-        error={error}
         question={{
           ...q,
           defaultValue: [q.min, q.max] as [number, number],
         }}
         readOnly={readOnly}
-        value={values}
-        onChange={onChange as (value: [number, number]) => void}
+        response={response as QuestionResponse<[number, number]> | undefined}
+        onChange={onChange as (response: QuestionResponse<[number, number]>) => void}
         onValidate={onValidate as ((value: [number, number]) => string[]) | undefined}
       >
         <div className="space-y-4">
@@ -291,14 +302,13 @@ export const Slider: React.FC<QuestionComponentProps<number | [number, number]>>
     <QuestionWrapper<number>
       className={className}
       disabled={disabled}
-      error={error}
       question={{
         ...q,
         defaultValue: q.min,
       }}
       readOnly={readOnly}
-      value={singleValue}
-      onChange={onChange as (value: number) => void}
+      response={response as QuestionResponse<number> | undefined}
+      onChange={onChange as (response: QuestionResponse<number>) => void}
       onValidate={onValidate as ((value: number) => string[]) | undefined}
     >
       <div className="space-y-4">

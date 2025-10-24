@@ -1,7 +1,7 @@
 import React from 'react';
 import type {
   AnyQuestion,
-  QuestionComponentProps,
+  QuestionResponse,
   ShortAnswerQuestion,
   LongFormQuestion,
   MultipleChoiceQuestion,
@@ -19,21 +19,24 @@ import Slider from '../types/Slider';
 import StackRanking from '../types/StackRanking';
 import NumericAnswer from '../types/NumericAnswer';
 
-interface QuestionRendererProps extends Omit<QuestionComponentProps, 'question'> {
+interface QuestionRendererProps<T = unknown> {
   question: AnyQuestion;
+  response?: QuestionResponse<T>;
+  onChange: (response: QuestionResponse<T>) => void;
+  onValidate?: (value: T) => string[];
+  disabled?: boolean;
+  readOnly?: boolean;
+  className?: string;
 }
 
 export const QuestionRenderer: React.FC<QuestionRendererProps> = ({
   question,
-  value,
+  response,
   onChange,
   onValidate,
-  onVeto,
   disabled,
   readOnly,
-  error,
   className,
-  vetoed,
 }) => {
   // Props are passed directly to each component with proper typing
 
@@ -42,15 +45,12 @@ export const QuestionRenderer: React.FC<QuestionRendererProps> = ({
       return (
         <ShortAnswer
           question={question as ShortAnswerQuestion}
-          value={value as string | undefined}
-          onChange={onChange as (value: string) => void}
+          response={response as QuestionResponse<string> | undefined}
+          onChange={onChange as (response: QuestionResponse<string>) => void}
           onValidate={onValidate as ((value: string) => string[]) | undefined}
-          onVeto={onVeto}
           disabled={disabled}
           readOnly={readOnly}
-          error={error}
           className={className}
-          vetoed={vetoed}
         />
       );
 
@@ -58,15 +58,12 @@ export const QuestionRenderer: React.FC<QuestionRendererProps> = ({
       return (
         <LongForm
           question={question as LongFormQuestion}
-          value={value as string | undefined}
-          onChange={onChange as (value: string) => void}
+          response={response as QuestionResponse<string> | undefined}
+          onChange={onChange as (response: QuestionResponse<string>) => void}
           onValidate={onValidate as ((value: string) => string[]) | undefined}
-          onVeto={onVeto}
           disabled={disabled}
           readOnly={readOnly}
-          error={error}
           className={className}
-          vetoed={vetoed}
         />
       );
 
@@ -74,15 +71,12 @@ export const QuestionRenderer: React.FC<QuestionRendererProps> = ({
       return (
         <MultipleChoice
           question={question as MultipleChoiceQuestion}
-          value={value as MultipleChoiceAnswer | undefined}
-          onChange={onChange as (value: MultipleChoiceAnswer) => void}
+          response={response as QuestionResponse<MultipleChoiceAnswer> | undefined}
+          onChange={onChange as (response: QuestionResponse<MultipleChoiceAnswer>) => void}
           onValidate={onValidate as ((value: MultipleChoiceAnswer) => string[]) | undefined}
-          onVeto={onVeto}
           disabled={disabled}
           readOnly={readOnly}
-          error={error}
           className={className}
-          vetoed={vetoed}
         />
       );
 
@@ -90,15 +84,12 @@ export const QuestionRenderer: React.FC<QuestionRendererProps> = ({
       return (
         <TrueFalse
           question={question as TrueFalseQuestion}
-          value={value as boolean | undefined}
-          onChange={onChange as (value: boolean) => void}
+          response={response as QuestionResponse<boolean> | undefined}
+          onChange={onChange as (response: QuestionResponse<boolean>) => void}
           onValidate={onValidate as ((value: boolean) => string[]) | undefined}
-          onVeto={onVeto}
           disabled={disabled}
           readOnly={readOnly}
-          error={error}
           className={className}
-          vetoed={vetoed}
         />
       );
 
@@ -106,15 +97,12 @@ export const QuestionRenderer: React.FC<QuestionRendererProps> = ({
       return (
         <Slider
           question={question as SliderQuestion}
-          value={value as (number | [number, number]) | undefined}
-          onChange={onChange as (value: number | [number, number]) => void}
+          response={response as QuestionResponse<number | [number, number]> | undefined}
+          onChange={onChange as (response: QuestionResponse<number | [number, number]>) => void}
           onValidate={onValidate as ((value: number | [number, number]) => string[]) | undefined}
-          onVeto={onVeto}
           disabled={disabled}
           readOnly={readOnly}
-          error={error}
           className={className}
-          vetoed={vetoed}
         />
       );
 
@@ -122,15 +110,12 @@ export const QuestionRenderer: React.FC<QuestionRendererProps> = ({
       return (
         <StackRanking
           question={question as StackRankingQuestion}
-          value={value as string[] | undefined}
-          onChange={onChange as (value: string[]) => void}
+          response={response as QuestionResponse<string[]> | undefined}
+          onChange={onChange as (response: QuestionResponse<string[]>) => void}
           onValidate={onValidate as ((value: string[]) => string[]) | undefined}
-          onVeto={onVeto}
           disabled={disabled}
           readOnly={readOnly}
-          error={error}
           className={className}
-          vetoed={vetoed}
         />
       );
 
@@ -138,15 +123,12 @@ export const QuestionRenderer: React.FC<QuestionRendererProps> = ({
       return (
         <NumericAnswer
           question={question as NumericQuestion}
-          value={value as number | undefined}
-          onChange={onChange as (value: number) => void}
+          response={response as QuestionResponse<number> | undefined}
+          onChange={onChange as (response: QuestionResponse<number>) => void}
           onValidate={onValidate as ((value: number) => string[]) | undefined}
-          onVeto={onVeto}
           disabled={disabled}
           readOnly={readOnly}
-          error={error}
           className={className}
-          vetoed={vetoed}
         />
       );
 

@@ -329,18 +329,10 @@ const QuestionsDemo: React.FC = () => {
     setVisibleQuestions(engine.getVisibleQuestions());
   }, []);
 
-  const handleQuestionChange = (questionId: string, value: unknown) => {
-    const response: QuestionResponse = {
-      questionId,
-      value,
-      timestamp: new Date(),
-      valid: true, // Simple validation for demo
-      errors: [],
-    };
-
+  const handleChange = (response: QuestionResponse) => {
     const newResponses = {
       ...formState.responses,
-      [questionId]: response,
+      [response.questionId]: response,
     };
 
     setFormState((prev) => ({
@@ -351,37 +343,7 @@ const QuestionsDemo: React.FC = () => {
 
     // Update conditional logic
     if (conditionalEngine) {
-      conditionalEngine.updateResponse(questionId, response);
-      setVisibleQuestions(conditionalEngine.getVisibleQuestions());
-    }
-  };
-
-  const handleVeto = (questionId: string, vetoed: boolean, reason?: string) => {
-    const existingResponse = formState.responses[questionId];
-    const response: QuestionResponse = {
-      questionId,
-      value: existingResponse?.value,
-      timestamp: existingResponse?.timestamp ?? new Date(),
-      valid: existingResponse?.valid ?? true,
-      errors: existingResponse?.errors ?? [],
-      vetoed,
-      vetoReason: reason,
-    };
-
-    const newResponses = {
-      ...formState.responses,
-      [questionId]: response,
-    };
-
-    setFormState((prev) => ({
-      ...prev,
-      responses: newResponses,
-      isDirty: true,
-    }));
-
-    // Update conditional logic
-    if (conditionalEngine) {
-      conditionalEngine.updateResponse(questionId, response);
+      conditionalEngine.updateResponse(response.questionId, response);
       setVisibleQuestions(conditionalEngine.getVisibleQuestions());
     }
   };
@@ -550,10 +512,8 @@ const QuestionsDemo: React.FC = () => {
                   <div key={question.id}>
                     <QuestionRenderer
                       question={question}
-                      value={formState.responses[question.id]?.value}
-                      vetoed={formState.responses[question.id]?.vetoed}
-                      onChange={(value) => handleQuestionChange(question.id, value)}
-                      onVeto={(vetoed, reason) => handleVeto(question.id, vetoed, reason)}
+                      response={formState.responses[question.id]}
+                      onChange={handleChange}
                       disabled={formState.isSubmitting}
                     />
                   </div>
@@ -572,8 +532,7 @@ const QuestionsDemo: React.FC = () => {
               }}
               responses={formState.responses}
               onGroupComplete={handleGroupComplete}
-              onQuestionChange={handleQuestionChange}
-              onVeto={handleVeto}
+              onChange={handleChange}
             />
           ))}
         </div>

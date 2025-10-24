@@ -4,15 +4,15 @@ import QuestionWrapper from '../core/QuestionWrapper';
 
 export const TrueFalse: React.FC<QuestionComponentProps<boolean>> = ({
   question,
-  value = false,
+  response,
   onChange,
   onValidate,
   disabled = false,
   readOnly = false,
-  error,
   className = '',
 }) => {
   const q = question as TrueFalseQuestion;
+  const value = response?.value ?? false;
   const [localValue, setLocalValue] = useState(value);
 
   useEffect(() => {
@@ -21,7 +21,15 @@ export const TrueFalse: React.FC<QuestionComponentProps<boolean>> = ({
 
   const handleChange = (newValue: boolean) => {
     setLocalValue(newValue);
-    onChange(newValue);
+    onChange({
+      questionId: question.id,
+      value: newValue,
+      timestamp: new Date(),
+      valid: true,
+      errors: [],
+      vetoed: response?.vetoed,
+      vetoReason: response?.vetoReason,
+    });
   };
 
   const trueLabel = q.trueLabel || 'True';
@@ -147,10 +155,9 @@ export const TrueFalse: React.FC<QuestionComponentProps<boolean>> = ({
     <QuestionWrapper<boolean>
       className={className}
       disabled={disabled}
-      error={error}
       question={question}
       readOnly={readOnly}
-      value={localValue}
+      response={response}
       onChange={onChange}
       onValidate={onValidate}
     >

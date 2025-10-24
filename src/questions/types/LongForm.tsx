@@ -4,15 +4,16 @@ import QuestionWrapper from '../core/QuestionWrapper';
 
 export const LongForm: React.FC<QuestionComponentProps<string>> = ({
   question,
-  value = '',
+  response,
   onChange,
   onValidate,
   disabled = false,
   readOnly = false,
-  error,
   className = '',
 }) => {
   const q = question as LongFormQuestion;
+  const value = response?.value ?? '';
+  const error = response?.errors?.[0];
   const [localValue, setLocalValue] = useState(value);
   const [wordCount, setWordCount] = useState(0);
   const textAreaRef = useRef<HTMLTextAreaElement>(null);
@@ -41,6 +42,18 @@ export const LongForm: React.FC<QuestionComponentProps<string>> = ({
     }
   };
 
+  const emitChange = (newValue: string) => {
+    onChange({
+      questionId: question.id,
+      value: newValue,
+      timestamp: new Date(),
+      valid: true,
+      errors: [],
+      vetoed: response?.vetoed,
+      vetoReason: response?.vetoReason,
+    });
+  };
+
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const newValue = e.target.value;
 
@@ -48,7 +61,7 @@ export const LongForm: React.FC<QuestionComponentProps<string>> = ({
 
     setLocalValue(newValue);
     updateWordCount(newValue);
-    onChange(newValue);
+    emitChange(newValue);
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
@@ -59,7 +72,7 @@ export const LongForm: React.FC<QuestionComponentProps<string>> = ({
         const end = e.currentTarget.selectionEnd;
         const newValue = localValue.substring(0, start) + '  ' + localValue.substring(end);
         setLocalValue(newValue);
-        onChange(newValue);
+        emitChange(newValue);
         setTimeout(() => {
           if (textAreaRef.current) {
             textAreaRef.current.selectionStart = textAreaRef.current.selectionEnd = start + 2;
@@ -79,7 +92,7 @@ export const LongForm: React.FC<QuestionComponentProps<string>> = ({
       localValue.substring(0, start) + prefix + selectedText + suffix + localValue.substring(end);
 
     setLocalValue(newText);
-    onChange(newText);
+    emitChange(newText);
 
     setTimeout(() => {
       if (textAreaRef.current) {
@@ -94,10 +107,9 @@ export const LongForm: React.FC<QuestionComponentProps<string>> = ({
     <QuestionWrapper<string>
       className={className}
       disabled={disabled}
-      error={error}
       question={question}
       readOnly={readOnly}
-      value={localValue}
+      response={response}
       onChange={onChange}
       onValidate={onValidate}
     >

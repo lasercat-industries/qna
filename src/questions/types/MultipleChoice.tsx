@@ -9,12 +9,11 @@ import QuestionWrapper from '../core/QuestionWrapper';
 
 export const MultipleChoice: React.FC<QuestionComponentProps<MultipleChoiceAnswer>> = ({
   question,
-  value,
+  response,
   onChange,
   onValidate,
   disabled = false,
   readOnly = false,
-  error,
   className = '',
 }) => {
   const q = question as MultipleChoiceQuestion;
@@ -25,7 +24,7 @@ export const MultipleChoice: React.FC<QuestionComponentProps<MultipleChoiceAnswe
     additionalText: '',
   };
 
-  const currentValue = value || defaultValue;
+  const currentValue = response?.value || defaultValue;
 
   const [selectedChoices, setSelectedChoices] = useState<string[]>(
     currentValue.selectedChoices || [],
@@ -33,17 +32,27 @@ export const MultipleChoice: React.FC<QuestionComponentProps<MultipleChoiceAnswe
   const [additionalText, setAdditionalText] = useState(currentValue.additionalText || '');
 
   useEffect(() => {
-    const val = value || defaultValue;
+    const val = response?.value || defaultValue;
     setSelectedChoices(val.selectedChoices || []);
     setAdditionalText(val.additionalText || '');
-  }, [value]);
+  }, [response?.value]);
 
   const emitChange = (choices: string[], text: string) => {
     const answer: MultipleChoiceAnswer = {
       selectedChoices: choices,
       additionalText: text,
     };
-    onChange(answer);
+
+    // Emit full response
+    onChange({
+      questionId: question.id,
+      value: answer,
+      timestamp: new Date(),
+      valid: true, // Will be validated by wrapper
+      errors: [],
+      vetoed: response?.vetoed,
+      vetoReason: response?.vetoReason,
+    });
   };
 
   const handleOptionChange = (optionId: string) => {
@@ -149,10 +158,9 @@ export const MultipleChoice: React.FC<QuestionComponentProps<MultipleChoiceAnswe
     <QuestionWrapper<MultipleChoiceAnswer>
       className={className}
       disabled={disabled}
-      error={error}
       question={question}
       readOnly={readOnly}
-      value={value}
+      response={response}
       onChange={onChange}
       onValidate={onValidate}
     >

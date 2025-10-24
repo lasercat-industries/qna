@@ -15,7 +15,31 @@ A flexible, type-safe React-based framework for building dynamic questionnaires 
 ## Installation
 
 ```bash
-bun install
+npm install @lasercat/qna
+# or
+yarn add @lasercat/qna
+# or
+bun add @lasercat/qna
+```
+
+### Styling Requirements
+
+This library uses Tailwind CSS for styling. You must have Tailwind CSS v4 installed in your project:
+
+```bash
+npm install -D tailwindcss@4
+```
+
+Then configure Tailwind to process the library's components:
+
+```js
+// tailwind.config.js
+export default {
+  content: [
+    './src/**/*.{js,jsx,ts,tsx}',
+    './node_modules/@lasercat/qna/**/*.{js,jsx}', // Add this line
+  ],
+};
 ```
 
 ## Usage
@@ -23,8 +47,8 @@ bun install
 ### Basic Example
 
 ```tsx
-import { QuestionRenderer } from './questions/core/QuestionRenderer';
-import type { MultipleChoiceQuestion } from './questions/types';
+import { QuestionRenderer } from '@lasercat/qna';
+import type { MultipleChoiceQuestion, QuestionResponse } from '@lasercat/qna';
 
 const question: MultipleChoiceQuestion = {
   id: 'skills',
@@ -43,9 +67,38 @@ const question: MultipleChoiceQuestion = {
 };
 
 function MyForm() {
-  const [value, setValue] = useState<string[]>([]);
+  const [responses, setResponses] = useState<Record<string, QuestionResponse>>({});
 
-  return <QuestionRenderer question={question} value={value} onChange={setValue} />;
+  const handleChange = (response: QuestionResponse) => {
+    setResponses(prev => ({
+      ...prev,
+      [response.questionId]: response,
+    }));
+  };
+
+  return (
+    <QuestionRenderer
+      question={question}
+      response={responses[question.id]}
+      onChange={handleChange}
+    />
+  );
+}
+```
+
+### Response Format
+
+All question changes emit a complete `QuestionResponse` object:
+
+```tsx
+interface QuestionResponse<T = unknown> {
+  questionId: string;
+  value: T;              // The answer value
+  timestamp: Date;
+  valid: boolean;        // Whether it passes validation
+  errors?: string[];     // Validation error messages
+  vetoed?: boolean;      // If user vetoed the question (see Veto System)
+  vetoReason?: string;   // Optional reason for veto
 }
 ```
 
@@ -256,6 +309,88 @@ const question: Question = {
   priority: 'high',
   priorityDisplayStyle: 'chip', // 'border-left' | 'border-all' | 'background' | 'chip' | 'dot' | 'none'
 };
+```
+
+## Veto System
+
+The veto system allows users to mark questions as problematic or not applicable. Vetoed questions:
+- Display with reduced opacity and are disabled
+- Show a message indicating they're vetoed
+- Are still included in form submission with `vetoed: true` flag
+- Count as "complete" for progress tracking
+- Preserve their answer value (can be un-vetoed without data loss)
+
+### Enabling Veto
+
+Enable veto on individual questions:
+
+```tsx
+const question: ShortAnswerQuestion = {
+  id: 'income',
+  type: 'short-answer',
+  text: 'What is your annual income?',
+  required: true,
+  priority: 'medium',
+  tags: [],
+  allowVeto: true,  // Enable veto checkbox
+  vetoLabel: 'I prefer not to answer this',  // Optional custom label
+};
+```
+
+### Handling Vetoed Responses
+
+Vetoed questions are included in responses with a flag:
+
+```tsx
+// Filter out vetoed questions before submission (if desired)
+const finalResponses = Object.entries(responses)
+  .filter(([_, response]) => !response.vetoed)
+  .reduce((acc, [id, response]) => ({ ...acc, [id]: response }), {});
+
+// Or keep them to track which questions were problematic
+const allResponses = responses;  // Includes vetoed with { vetoed: true, vetoReason: "..." }
+```
+
+## Question Groups
+
+Organize related questions into groups with progress tracking:
+
+```tsx
+import { QuestionGroup } from '@lasercat/qna';
+import type { QuestionGroupType, QuestionResponse } from '@lasercat/qna';
+
+const group: QuestionGroupType = {
+  id: 'personal-info',
+  name: 'Personal Information',
+  description: 'Tell us about yourself',
+  priority: 'high',
+  tags: ['onboarding'],
+  collapsible: true,
+  defaultExpanded: true,
+  questions: [
+    // ... your questions
+  ],
+};
+
+function MyForm() {
+  const [responses, setResponses] = useState<Record<string, QuestionResponse>>({});
+
+  const handleChange = (response: QuestionResponse) => {
+    setResponses(prev => ({
+      ...prev,
+      [response.questionId]: response,
+    }));
+  };
+
+  return (
+    <QuestionGroup
+      group={group}
+      responses={responses}
+      onChange={handleChange}
+      onGroupComplete={(groupId) => console.log(`${groupId} completed!`)}
+    />
+  );
+}
 ```
 
 ## Development

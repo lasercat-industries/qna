@@ -1,18 +1,15 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import type { Question, Priority, PriorityDisplayStyle } from '../types';
+import type { Question, Priority, PriorityDisplayStyle, QuestionResponse } from '../types';
 
 interface QuestionWrapperProps<T = unknown> {
   question: Question<T>;
   children: React.ReactNode;
-  value?: T;
-  onChange?: (value: T) => void;
+  response?: QuestionResponse<T>;
+  onChange?: (response: QuestionResponse<T>) => void;
   onValidate?: (value: T) => string[];
-  onVeto?: (vetoed: boolean, reason?: string) => void;
   disabled?: boolean;
   readOnly?: boolean;
-  error?: string;
   className?: string;
-  vetoed?: boolean;
 }
 
 const getPriorityColor = (
@@ -102,20 +99,21 @@ const getPriorityIcon = (priority: Priority): string => {
 export function QuestionWrapper<T = unknown>({
   question,
   children,
-  value,
-  onChange: _onChange,
+  response,
+  onChange,
   onValidate,
-  onVeto,
   disabled = false,
   readOnly = false,
-  error: externalError,
   className = '',
-  vetoed: externalVetoed = false,
 }: QuestionWrapperProps<T>) {
+  const value = response?.value;
+  const externalError = response?.errors?.[0];
+  const externalVetoed = response?.vetoed ?? false;
+
   const [internalError, setInternalError] = useState<string>('');
   const [isVetoed, setIsVetoed] = useState(externalVetoed);
   const [showVetoReason, setShowVetoReason] = useState(false);
-  const [vetoReason, setVetoReason] = useState<string>('');
+  const [vetoReason, setVetoReason] = useState(response?.vetoReason ?? '');
   const [touched, setTouched] = useState(false);
 
   const validateValue = useCallback(
@@ -228,13 +226,30 @@ export function QuestionWrapper<T = unknown>({
       setVetoReason('');
       setShowVetoReason(false);
     }
-    onVeto?.(newVetoed, newVetoed ? vetoReason : undefined);
+
+    // Emit full response with veto update
+    if (onChange && response) {
+      onChange({
+        ...response,
+        vetoed: newVetoed,
+        vetoReason: newVetoed ? vetoReason : undefined,
+        timestamp: new Date(),
+      });
+    }
   };
 
   const handleVetoReasonChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setVetoReason(e.target.value);
-    if (isVetoed) {
-      onVeto?.(true, e.target.value);
+    const newReason = e.target.value;
+    setVetoReason(newReason);
+
+    // Emit full response with reason update
+    if (isVetoed && onChange && response) {
+      onChange({
+        ...response,
+        vetoed: true,
+        vetoReason: newReason,
+        timestamp: new Date(),
+      });
     }
   };
 

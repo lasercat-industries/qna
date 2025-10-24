@@ -4,15 +4,16 @@ import QuestionWrapper from '../core/QuestionWrapper';
 
 export const ShortAnswer: React.FC<QuestionComponentProps<string>> = ({
   question,
-  value = '',
+  response,
   onChange,
   onValidate,
   disabled = false,
   readOnly = false,
-  error,
   className = '',
 }) => {
   const q = question as ShortAnswerQuestion;
+  const value = response?.value ?? '';
+  const error = response?.errors?.[0];
   const [localValue, setLocalValue] = useState(value);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [filteredSuggestions, setFilteredSuggestions] = useState<string[]>([]);
@@ -38,12 +39,28 @@ export const ShortAnswer: React.FC<QuestionComponentProps<string>> = ({
     if (q.maxLength && newValue.length > q.maxLength) return;
 
     setLocalValue(newValue);
-    onChange(newValue);
+    onChange({
+      questionId: question.id,
+      value: newValue,
+      timestamp: new Date(),
+      valid: true,
+      errors: [],
+      vetoed: response?.vetoed,
+      vetoReason: response?.vetoReason,
+    });
   };
 
   const handleSuggestionClick = (suggestion: string) => {
     setLocalValue(suggestion);
-    onChange(suggestion);
+    onChange({
+      questionId: question.id,
+      value: suggestion,
+      timestamp: new Date(),
+      valid: true,
+      errors: [],
+      vetoed: response?.vetoed,
+      vetoReason: response?.vetoReason,
+    });
     setShowSuggestions(false);
   };
 
@@ -57,10 +74,9 @@ export const ShortAnswer: React.FC<QuestionComponentProps<string>> = ({
     <QuestionWrapper<string>
       className={className}
       disabled={disabled}
-      error={error}
       question={question}
       readOnly={readOnly}
-      value={localValue}
+      response={response}
       onChange={onChange}
       onValidate={onValidate}
     >

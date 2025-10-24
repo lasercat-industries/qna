@@ -4,15 +4,16 @@ import QuestionWrapper from '../core/QuestionWrapper';
 
 export const NumericAnswer: React.FC<QuestionComponentProps<number>> = ({
   question,
-  value = 0,
+  response,
   onChange,
   onValidate,
   disabled = false,
   readOnly = false,
-  error,
   className = '',
 }) => {
   const q = question as NumericQuestion;
+  const value = response?.value ?? 0;
+  const error = response?.errors?.[0];
   const [localValue, setLocalValue] = useState<string>(value?.toString() || '');
   const [displayAsPercentage, setDisplayAsPercentage] = useState(q.showAsPercentage || false);
   const [isFocused, setIsFocused] = useState(false);
@@ -21,13 +22,25 @@ export const NumericAnswer: React.FC<QuestionComponentProps<number>> = ({
     setLocalValue(value?.toString() || '');
   }, [value]);
 
+  const emitChange = (newValue: number) => {
+    onChange({
+      questionId: question.id,
+      value: newValue,
+      timestamp: new Date(),
+      valid: true,
+      errors: [],
+      vetoed: response?.vetoed,
+      vetoReason: response?.vetoReason,
+    });
+  };
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const inputValue = e.target.value;
 
     // Allow empty string for clearing
     if (inputValue === '') {
       setLocalValue('');
-      onChange(0);
+      emitChange(0);
       return;
     }
 
@@ -55,7 +68,7 @@ export const NumericAnswer: React.FC<QuestionComponentProps<number>> = ({
         constrainedValue = q.max;
       }
 
-      onChange(constrainedValue);
+      emitChange(constrainedValue);
     }
   };
 
@@ -74,7 +87,7 @@ export const NumericAnswer: React.FC<QuestionComponentProps<number>> = ({
       setLocalValue(formatted);
     } else if (localValue === '') {
       setLocalValue('0');
-      onChange(0);
+      emitChange(0);
     }
   };
 
@@ -91,7 +104,7 @@ export const NumericAnswer: React.FC<QuestionComponentProps<number>> = ({
       const formatted =
         q.precision !== undefined ? newValue.toFixed(q.precision) : newValue.toString();
       setLocalValue(formatted);
-      onChange(newValue);
+      emitChange(newValue);
     }
   };
 
@@ -104,7 +117,7 @@ export const NumericAnswer: React.FC<QuestionComponentProps<number>> = ({
       const formatted =
         q.precision !== undefined ? newValue.toFixed(q.precision) : newValue.toString();
       setLocalValue(formatted);
-      onChange(newValue);
+      emitChange(newValue);
     }
   };
 
@@ -127,10 +140,9 @@ export const NumericAnswer: React.FC<QuestionComponentProps<number>> = ({
     <QuestionWrapper<number>
       className={className}
       disabled={disabled}
-      error={error}
       question={question}
       readOnly={readOnly}
-      value={parseFloat(localValue) || 0}
+      response={response}
       onChange={onChange}
       onValidate={onValidate}
     >

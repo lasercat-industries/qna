@@ -5,8 +5,7 @@ import QuestionRenderer from './QuestionRenderer';
 interface QuestionGroupProps {
   group: QuestionGroupType;
   responses: Record<string, QuestionResponse>;
-  onQuestionChange: (questionId: string, value: unknown) => void;
-  onVeto?: (questionId: string, vetoed: boolean, reason?: string) => void;
+  onChange: (response: QuestionResponse) => void;
   onGroupComplete?: (groupId: string) => void;
   disabled?: boolean;
   readOnly?: boolean;
@@ -31,8 +30,7 @@ const getPriorityBadge = (priority: Priority) => {
 export const QuestionGroup: React.FC<QuestionGroupProps> = ({
   group,
   responses,
-  onQuestionChange,
-  onVeto,
+  onChange,
   onGroupComplete,
   disabled = false,
   readOnly = false,
@@ -73,8 +71,8 @@ export const QuestionGroup: React.FC<QuestionGroupProps> = ({
     }
   }, [responses, group, visibleQuestions, onGroupComplete]);
 
-  const handleQuestionChange = (questionId: string, value: unknown) => {
-    onQuestionChange(questionId, value);
+  const handleQuestionChange = (response: QuestionResponse) => {
+    onChange(response);
   };
 
   const toggleExpand = () => {
@@ -189,15 +187,10 @@ export const QuestionGroup: React.FC<QuestionGroupProps> = ({
 
                 <QuestionRenderer
                   disabled={disabled}
-                  error={response?.errors?.[0]}
                   question={question}
                   readOnly={readOnly}
-                  value={response?.value}
-                  vetoed={response?.vetoed}
-                  onChange={(value) => handleQuestionChange(question.id, value)}
-                  onVeto={
-                    onVeto ? (vetoed, reason) => onVeto(question.id, vetoed, reason) : undefined
-                  }
+                  response={response}
+                  onChange={handleQuestionChange}
                 />
               </div>
             );

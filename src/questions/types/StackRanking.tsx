@@ -4,18 +4,30 @@ import QuestionWrapper from '../core/QuestionWrapper';
 
 export const StackRanking: React.FC<QuestionComponentProps<string[]>> = ({
   question,
-  value = [],
+  response,
   onChange,
   onValidate,
   disabled = false,
   readOnly = false,
-  error,
   className = '',
 }) => {
   const q = question as StackRankingQuestion;
+  const value = response?.value ?? [];
   const [items, setItems] = useState<StackRankingItem[]>([]);
   const [draggedItem, setDraggedItem] = useState<string | null>(null);
   const [dragOverItem, setDragOverItem] = useState<string | null>(null);
+
+  const emitChange = (newValue: string[]) => {
+    onChange({
+      questionId: question.id,
+      value: newValue,
+      timestamp: new Date(),
+      valid: true,
+      errors: [],
+      vetoed: response?.vetoed,
+      vetoReason: response?.vetoReason,
+    });
+  };
 
   // Initialize items only once or when the question items change structurally
   useEffect(() => {
@@ -93,7 +105,7 @@ export const StackRanking: React.FC<QuestionComponentProps<string[]>> = ({
 
         setItems(newItems);
         const newValue = newItems.map((item) => item.id);
-        onChange(newValue);
+        emitChange(newValue);
       }
     }
 
@@ -141,7 +153,7 @@ export const StackRanking: React.FC<QuestionComponentProps<string[]>> = ({
 
         setItems(newItems);
         const newValue = newItems.map((item) => item.id);
-        onChange(newValue);
+        emitChange(newValue);
       }
 
       // Focus management
@@ -156,10 +168,9 @@ export const StackRanking: React.FC<QuestionComponentProps<string[]>> = ({
     <QuestionWrapper<string[]>
       className={className}
       disabled={disabled}
-      error={error}
       question={question}
       readOnly={readOnly}
-      value={items.map((i) => i.id)}
+      response={response}
       onChange={onChange}
       onValidate={onValidate}
     >
@@ -227,7 +238,7 @@ export const StackRanking: React.FC<QuestionComponentProps<string[]>> = ({
                       if (removed) {
                         newItems.splice(newIndex, 0, removed);
                         setItems(newItems);
-                        onChange(newItems.map((i) => i.id));
+                        emitChange(newItems.map((i) => i.id));
                       }
                     }
                   }}

@@ -190,13 +190,10 @@ export interface FormState {
 
 export interface QuestionComponentProps<T = unknown> {
   question: Question<T>;
-  value?: T;
-  onChange: (value: T) => void;
+  response?: QuestionResponse<T>;
+  onChange: (response: QuestionResponse<T>) => void;
   onValidate?: (value: T) => string[];
-  onVeto?: (vetoed: boolean, reason?: string) => void;
   disabled?: boolean;
   readOnly?: boolean;
-  error?: string;
   className?: string;
-  vetoed?: boolean;
 }
