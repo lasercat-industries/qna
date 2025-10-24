@@ -344,7 +344,7 @@ export function QuestionWrapper<T = unknown>({
 
       {isVetoed && (
         <div className="mt-2 text-sm text-amber-600 font-medium" role="alert">
-          This question has been vetoed and will not be included in the submission.
+          This question has been vetoed and will be marked as such in the submission.
         </div>
       )}
 

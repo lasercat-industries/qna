@@ -356,6 +356,36 @@ const QuestionsDemo: React.FC = () => {
     }
   };
 
+  const handleVeto = (questionId: string, vetoed: boolean, reason?: string) => {
+    const existingResponse = formState.responses[questionId];
+    const response: QuestionResponse = {
+      questionId,
+      value: existingResponse?.value,
+      timestamp: existingResponse?.timestamp ?? new Date(),
+      valid: existingResponse?.valid ?? true,
+      errors: existingResponse?.errors ?? [],
+      vetoed,
+      vetoReason: reason,
+    };
+
+    const newResponses = {
+      ...formState.responses,
+      [questionId]: response,
+    };
+
+    setFormState((prev) => ({
+      ...prev,
+      responses: newResponses,
+      isDirty: true,
+    }));
+
+    // Update conditional logic
+    if (conditionalEngine) {
+      conditionalEngine.updateResponse(questionId, response);
+      setVisibleQuestions(conditionalEngine.getVisibleQuestions());
+    }
+  };
+
   const handleGroupComplete = (groupId: string) => {
     setFormState((prev) => ({
       ...prev,
@@ -521,7 +551,9 @@ const QuestionsDemo: React.FC = () => {
                     <QuestionRenderer
                       question={question}
                       value={formState.responses[question.id]?.value}
+                      vetoed={formState.responses[question.id]?.vetoed}
                       onChange={(value) => handleQuestionChange(question.id, value)}
+                      onVeto={(vetoed, reason) => handleVeto(question.id, vetoed, reason)}
                       disabled={formState.isSubmitting}
                     />
                   </div>
@@ -541,6 +573,7 @@ const QuestionsDemo: React.FC = () => {
               responses={formState.responses}
               onGroupComplete={handleGroupComplete}
               onQuestionChange={handleQuestionChange}
+              onVeto={handleVeto}
             />
           ))}
         </div>

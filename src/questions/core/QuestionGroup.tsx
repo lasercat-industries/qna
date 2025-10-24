@@ -6,6 +6,7 @@ interface QuestionGroupProps {
   group: QuestionGroupType;
   responses: Record<string, QuestionResponse>;
   onQuestionChange: (questionId: string, value: unknown) => void;
+  onVeto?: (questionId: string, vetoed: boolean, reason?: string) => void;
   onGroupComplete?: (groupId: string) => void;
   disabled?: boolean;
   readOnly?: boolean;
@@ -31,6 +32,7 @@ export const QuestionGroup: React.FC<QuestionGroupProps> = ({
   group,
   responses,
   onQuestionChange,
+  onVeto,
   onGroupComplete,
   disabled = false,
   readOnly = false,
@@ -50,11 +52,11 @@ export const QuestionGroup: React.FC<QuestionGroupProps> = ({
   }, [group.questions]);
 
   useEffect(() => {
-    // Track completed questions
+    // Track completed questions (valid responses or vetoed questions count as complete)
     const completed = new Set<string>();
     group.questions.forEach((question) => {
       const response = responses[question.id];
-      if (response && response.valid) {
+      if (response && (response.valid || response.vetoed)) {
         completed.add(question.id);
       }
     });
@@ -191,7 +193,11 @@ export const QuestionGroup: React.FC<QuestionGroupProps> = ({
                   question={question}
                   readOnly={readOnly}
                   value={response?.value}
+                  vetoed={response?.vetoed}
                   onChange={(value) => handleQuestionChange(question.id, value)}
+                  onVeto={
+                    onVeto ? (vetoed, reason) => onVeto(question.id, vetoed, reason) : undefined
+                  }
                 />
               </div>
             );
