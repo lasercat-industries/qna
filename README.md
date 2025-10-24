@@ -70,7 +70,7 @@ function MyForm() {
   const [responses, setResponses] = useState<Record<string, QuestionResponse>>({});
 
   const handleChange = (response: QuestionResponse) => {
-    setResponses(prev => ({
+    setResponses((prev) => ({
       ...prev,
       [response.questionId]: response,
     }));
@@ -93,12 +93,12 @@ All question changes emit a complete `QuestionResponse` object:
 ```tsx
 interface QuestionResponse<T = unknown> {
   questionId: string;
-  value: T;              // The answer value
+  value: T; // The answer value
   timestamp: Date;
-  valid: boolean;        // Whether it passes validation
-  errors?: string[];     // Validation error messages
-  vetoed?: boolean;      // If user vetoed the question (see Veto System)
-  vetoReason?: string;   // Optional reason for veto
+  valid: boolean; // Whether it passes validation
+  errors?: string[]; // Validation error messages
+  vetoed?: boolean; // If user vetoed the question (see Veto System)
+  vetoReason?: string; // Optional reason for veto
 }
 ```
 
@@ -314,6 +314,7 @@ const question: Question = {
 ## Veto System
 
 The veto system allows users to mark questions as problematic or not applicable. Vetoed questions:
+
 - Display with reduced opacity and are disabled
 - Show a message indicating they're vetoed
 - Are still included in form submission with `vetoed: true` flag
@@ -332,8 +333,8 @@ const question: ShortAnswerQuestion = {
   required: true,
   priority: 'medium',
   tags: [],
-  allowVeto: true,  // Enable veto checkbox
-  vetoLabel: 'I prefer not to answer this',  // Optional custom label
+  allowVeto: true, // Enable veto checkbox
+  vetoLabel: 'I prefer not to answer this', // Optional custom label
 };
 ```
 
@@ -348,7 +349,7 @@ const finalResponses = Object.entries(responses)
   .reduce((acc, [id, response]) => ({ ...acc, [id]: response }), {});
 
 // Or keep them to track which questions were problematic
-const allResponses = responses;  // Includes vetoed with { vetoed: true, vetoReason: "..." }
+const allResponses = responses; // Includes vetoed with { vetoed: true, vetoReason: "..." }
 ```
 
 ## Question Groups
@@ -376,7 +377,7 @@ function MyForm() {
   const [responses, setResponses] = useState<Record<string, QuestionResponse>>({});
 
   const handleChange = (response: QuestionResponse) => {
-    setResponses(prev => ({
+    setResponses((prev) => ({
       ...prev,
       [response.questionId]: response,
     }));

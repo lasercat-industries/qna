@@ -228,9 +228,18 @@ export function QuestionWrapper<T = unknown>({
     }
 
     // Emit full response with veto update
-    if (onChange && response) {
+    if (onChange) {
+      // Create response if it doesn't exist yet (question not answered)
+      const baseResponse = response || {
+        questionId: question.id,
+        value: undefined as unknown as T,
+        timestamp: new Date(),
+        valid: !question.required, // Vetoed questions don't need to be valid
+        errors: [],
+      };
+
       onChange({
-        ...response,
+        ...baseResponse,
         vetoed: newVetoed,
         vetoReason: newVetoed ? vetoReason : undefined,
         timestamp: new Date(),
@@ -243,9 +252,18 @@ export function QuestionWrapper<T = unknown>({
     setVetoReason(newReason);
 
     // Emit full response with reason update
-    if (isVetoed && onChange && response) {
+    if (isVetoed && onChange) {
+      // Create response if it doesn't exist yet
+      const baseResponse = response || {
+        questionId: question.id,
+        value: undefined as unknown as T,
+        timestamp: new Date(),
+        valid: !question.required,
+        errors: [],
+      };
+
       onChange({
-        ...response,
+        ...baseResponse,
         vetoed: true,
         vetoReason: newReason,
         timestamp: new Date(),
