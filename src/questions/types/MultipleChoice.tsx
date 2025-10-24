@@ -56,17 +56,23 @@ export const MultipleChoice: React.FC<QuestionComponentProps<MultipleChoiceAnswe
         newChoices = [...selectedChoices, optionId];
       }
     } else {
-      newChoices = [optionId];
+      // In exclusive mode with radio buttons, allow deselection by clicking again
+      if (additionalTextMode === 'exclusive' && selectedChoices.includes(optionId)) {
+        newChoices = [];
+      } else {
+        newChoices = [optionId];
+      }
     }
 
     // In exclusive mode, clear additional text when selecting an option
     let newText = additionalText;
     if (q.allowAdditionalText && additionalTextMode === 'exclusive' && newChoices.length > 0) {
       newText = '';
-      setAdditionalText('');
     }
 
+    // Update states together
     setSelectedChoices(newChoices);
+    setAdditionalText(newText);
     emitChange(newChoices, newText);
   };
 
