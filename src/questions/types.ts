@@ -106,7 +106,7 @@ export interface MultipleChoiceQuestion extends Question<MultipleChoiceAnswer> {
   columns?: number;
 }
 
-export interface TrueFalseQuestion extends Question<boolean> {
+export interface TrueFalseQuestion extends Question<boolean | undefined> {
   type: 'true-false';
   trueLabel?: string;
   falseLabel?: string;

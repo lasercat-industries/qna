@@ -84,9 +84,9 @@ export const QuestionRenderer: React.FC<QuestionRendererProps> = ({
       return (
         <TrueFalse
           question={question as TrueFalseQuestion}
-          response={response as QuestionResponse<boolean> | undefined}
-          onChange={onChange as (response: QuestionResponse<boolean>) => void}
-          onValidate={onValidate as ((value: boolean) => string[]) | undefined}
+          response={response as QuestionResponse<boolean | undefined> | undefined}
+          onChange={onChange as (response: QuestionResponse<boolean | undefined>) => void}
+          onValidate={onValidate as ((value: boolean | undefined) => string[]) | undefined}
           disabled={disabled}
           readOnly={readOnly}
           className={className}

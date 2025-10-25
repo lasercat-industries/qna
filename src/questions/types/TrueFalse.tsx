@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import type { TrueFalseQuestion, QuestionComponentProps } from '../types';
 import QuestionWrapper from '../core/QuestionWrapper';
 
-export const TrueFalse: React.FC<QuestionComponentProps<boolean>> = ({
+export const TrueFalse: React.FC<QuestionComponentProps<boolean | undefined>> = ({
   question,
   response,
   onChange,
@@ -12,8 +12,8 @@ export const TrueFalse: React.FC<QuestionComponentProps<boolean>> = ({
   className = '',
 }) => {
   const q = question as TrueFalseQuestion;
-  const value = response?.value ?? false;
-  const [localValue, setLocalValue] = useState(value);
+  const value = response?.value ?? q.defaultValue;
+  const [localValue, setLocalValue] = useState<boolean | undefined>(value);
 
   useEffect(() => {
     setLocalValue(value);
@@ -66,7 +66,7 @@ export const TrueFalse: React.FC<QuestionComponentProps<boolean>> = ({
           flex-1 px-4 py-3 rounded-lg border-2 font-medium
           transition-all duration-200
           ${
-            localValue === false
+            localValue === false && localValue !== undefined
               ? 'bg-red-50 border-red-500 text-red-700'
               : 'bg-white border-gray-300 text-gray-700 hover:border-gray-400'
           }
@@ -82,39 +82,61 @@ export const TrueFalse: React.FC<QuestionComponentProps<boolean>> = ({
     </div>
   );
 
-  const renderToggle = () => (
-    <div className="flex items-center">
-      <div className="relative inline-block">
-        <input
-          aria-label={`Toggle between ${trueLabel} and ${falseLabel}`}
-          checked={localValue}
-          className="sr-only"
-          disabled={disabled || readOnly}
-          type="checkbox"
-          onChange={(e) => handleChange(e.target.checked)}
-        />
-        <div
-          className={`
-            w-14 h-8 rounded-full cursor-pointer transition-colors duration-200
-            ${localValue ? 'bg-green-500' : 'bg-gray-300'}
-            ${disabled || readOnly ? 'opacity-60 cursor-not-allowed' : ''}
-          `}
-          onClick={() => !disabled && !readOnly && handleChange(!localValue)}
-        >
+  const renderToggle = () => {
+    const getToggleLabel = () => {
+      if (localValue === undefined) return 'Not selected';
+      return localValue ? trueLabel : falseLabel;
+    };
+
+    const getToggleColor = () => {
+      if (localValue === true) return 'bg-green-500';
+      if (localValue === false) return 'bg-red-500';
+      return 'bg-gray-300';
+    };
+
+    const getTogglePosition = () => {
+      if (localValue === true) return 'translate-x-7';
+      if (localValue === false) return 'translate-x-1';
+      return 'translate-x-4'; // Center position for undefined
+    };
+
+    return (
+      <div className="flex items-center">
+        <div className="relative inline-block">
+          <input
+            aria-label={`Toggle between ${trueLabel} and ${falseLabel}`}
+            checked={localValue === true}
+            className="sr-only"
+            disabled={disabled || readOnly}
+            type="checkbox"
+            onChange={(e) => handleChange(e.target.checked)}
+          />
           <div
             className={`
-              absolute top-1 w-6 h-6 bg-white rounded-full shadow-md
-              transform transition-transform duration-200
-              ${localValue ? 'translate-x-7' : 'translate-x-1'}
+              w-14 h-8 rounded-full cursor-pointer transition-colors duration-200
+              ${getToggleColor()}
+              ${disabled || readOnly ? 'opacity-60 cursor-not-allowed' : ''}
             `}
-          />
+            onClick={() => {
+              if (disabled || readOnly) return;
+              if (localValue === undefined) handleChange(true);
+              else if (localValue === true) handleChange(false);
+              else handleChange(true);
+            }}
+          >
+            <div
+              className={`
+                absolute top-1 w-6 h-6 bg-white rounded-full shadow-md
+                transform transition-transform duration-200
+                ${getTogglePosition()}
+              `}
+            />
+          </div>
         </div>
+        <span className="ml-3 text-sm font-medium text-gray-700">{getToggleLabel()}</span>
       </div>
-      <span className="ml-3 text-sm font-medium text-gray-700">
-        {localValue ? trueLabel : falseLabel}
-      </span>
-    </div>
-  );
+    );
+  };
 
   const renderRadio = () => (
     <div className="space-y-2">
@@ -137,13 +159,13 @@ export const TrueFalse: React.FC<QuestionComponentProps<boolean>> = ({
         <input
           type="radio"
           name={`true-false-${question.id}`}
-          checked={localValue === false}
+          checked={localValue === false && localValue !== undefined}
           onChange={() => handleChange(false)}
           disabled={disabled || readOnly}
           className="h-4 w-4 text-red-600 border-gray-300 focus:ring-red-500"
         />
         <span
-          className={`ml-2 ${localValue === false ? 'font-medium text-red-700' : 'text-gray-700'}`}
+          className={`ml-2 ${localValue === false && localValue !== undefined ? 'font-medium text-red-700' : 'text-gray-700'}`}
         >
           {falseLabel}
         </span>
@@ -152,7 +174,7 @@ export const TrueFalse: React.FC<QuestionComponentProps<boolean>> = ({
   );
 
   return (
-    <QuestionWrapper<boolean>
+    <QuestionWrapper<boolean | undefined>
       className={className}
       disabled={disabled}
       question={question}
