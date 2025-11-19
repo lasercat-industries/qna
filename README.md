@@ -389,6 +389,7 @@ function MyForm() {
 ```
 
 When `hideAnswerWhenVetoed` is enabled:
+
 - Checking the veto checkbox hides the answer input/controls
 - Only the question text, veto checkbox, and veto message remain visible
 - Unchecking the veto checkbox reveals the answer controls again
