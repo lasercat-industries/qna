@@ -298,7 +298,7 @@ export function QuestionWrapper<T = unknown>({
       data-question-id={question.id}
       data-question-type={question.type}
     >
-      <div className="flex items-start gap-2 mb-2">
+      <div className="flex items-center gap-2 mb-2">
         {priorityStyle === 'dot' && (
           <span className="text-sm" title={`Priority: ${question.priority}`}>
             {getPriorityIcon(question.priority)}
@@ -312,7 +312,7 @@ export function QuestionWrapper<T = unknown>({
             <p className="text-sm text-gray-600 mb-2">{question.description}</p>
           )}
         </div>
-        <div className="flex gap-1 flex-wrap items-center">
+        <div className="flex gap-1 flex-wrap items-center self-start">
           {priorityStyle === 'chip' && (
             <span
               className={`px-2 py-1 text-xs rounded-full border ${getPriorityChipClass(question.priority)}`}
@@ -372,21 +372,29 @@ export function QuestionWrapper<T = unknown>({
         </div>
       )}
 
-      {!(hideAnswerWhenVetoed && isVetoed) && (
-        <div
-          className={`
-            question-content
-            ${priorityStyle === 'border-all' ? '' : priorityStyle === 'background' ? 'p-4' : 'p-3'}
-            ${getPriorityColor(question.priority, priorityStyle)}
-            ${showError ? 'bg-red-50' : priorityStyle === 'background' ? '' : priorityStyle === 'border-all' ? '' : 'bg-white'}
-            ${isVetoed ? 'opacity-50 pointer-events-none' : ''}
-            ${priorityStyle === 'border-all' ? '' : 'rounded-md'}
-          `}
-          onBlur={handleBlur}
-        >
-          {children}
+      <div
+        className={`
+          question-content-container
+          ${hideAnswerWhenVetoed && isVetoed ? 'grid-rows-[0fr] opacity-0' : 'grid-rows-[1fr] opacity-100'}
+          grid transition-all duration-300 ease-in-out
+        `}
+      >
+        <div className="overflow-hidden">
+          <div
+            className={`
+              question-content
+              ${priorityStyle === 'border-all' ? '' : priorityStyle === 'background' ? 'p-4' : 'p-3'}
+              ${getPriorityColor(question.priority, priorityStyle)}
+              ${showError ? 'bg-red-50' : priorityStyle === 'background' ? '' : priorityStyle === 'border-all' ? '' : 'bg-white'}
+              ${isVetoed && !hideAnswerWhenVetoed ? 'opacity-50 pointer-events-none' : ''}
+              ${priorityStyle === 'border-all' ? '' : 'rounded-md'}
+            `}
+            onBlur={handleBlur}
+          >
+            {children}
+          </div>
         </div>
-      )}
+      </div>
 
       {isVetoed && (
         <div className="mt-2 text-sm text-amber-600 font-medium" role="alert">

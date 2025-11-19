@@ -114,14 +114,18 @@ export const MultipleChoice: React.FC<QuestionComponentProps<MultipleChoiceAnswe
       additionalTextMode === 'exclusive' &&
       additionalText.trim().length > 0;
 
-    const handleClick = (e: React.MouseEvent) => {
-      if (disabled || readOnly || isDisabledByExclusiveMode) {
-        e.preventDefault();
-        return;
-      }
-      // For radio buttons, allow clicking to deselect
-      handleOptionChange(option.id);
-    };
+    // For radio buttons, use onClick to allow deselection
+    // For checkboxes, use normal onChange
+    const handleClick = q.multiple
+      ? undefined
+      : (e: React.MouseEvent) => {
+          if (disabled || readOnly || isDisabledByExclusiveMode) {
+            e.preventDefault();
+            return;
+          }
+          // For radio buttons, allow clicking to deselect
+          handleOptionChange(option.id);
+        };
 
     return (
       <label
@@ -137,12 +141,13 @@ export const MultipleChoice: React.FC<QuestionComponentProps<MultipleChoiceAnswe
         <input
           aria-label={option.label}
           checked={isSelected}
-          className="mt-1 pointer-events-none"
+          className={`mt-1 ${q.multiple ? '' : 'pointer-events-none'}`}
           disabled={disabled || readOnly || isDisabledByExclusiveMode}
           name={`question-${question.id}`}
           type={inputType}
           value={option.id}
-          readOnly
+          onChange={q.multiple ? () => handleOptionChange(option.id) : undefined}
+          readOnly={!q.multiple}
         />
         <div className="flex-1">
           {option.image && (
