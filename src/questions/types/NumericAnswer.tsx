@@ -12,6 +12,7 @@ export const NumericAnswer: React.FC<QuestionComponentProps<number>> = ({
   className = '',
   renderQuestionText,
   hideAnswerWhenVetoed,
+  vetoButtonClassName,
 }) => {
   const q = question as NumericQuestion;
   const value = response?.value ?? 0;
@@ -149,6 +150,7 @@ export const NumericAnswer: React.FC<QuestionComponentProps<number>> = ({
       onValidate={onValidate}
       renderQuestionText={renderQuestionText}
       hideAnswerWhenVetoed={hideAnswerWhenVetoed}
+      vetoButtonClassName={vetoButtonClassName}
     >
       <div className="flex items-stretch gap-2">
         <div className="relative flex-1">

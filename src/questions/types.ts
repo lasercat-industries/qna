@@ -200,4 +200,5 @@ export interface QuestionComponentProps<T = unknown> {
   className?: string;
   renderQuestionText?: (question: AnyQuestion) => React.ReactNode;
   hideAnswerWhenVetoed?: boolean;
+  vetoButtonClassName?: (isVetoed: boolean) => string;
 }

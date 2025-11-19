@@ -12,6 +12,7 @@ export const LongForm: React.FC<QuestionComponentProps<string>> = ({
   className = '',
   renderQuestionText,
   hideAnswerWhenVetoed,
+  vetoButtonClassName,
 }) => {
   const q = question as LongFormQuestion;
   const value = response?.value ?? '';
@@ -116,6 +117,7 @@ export const LongForm: React.FC<QuestionComponentProps<string>> = ({
       onValidate={onValidate}
       renderQuestionText={renderQuestionText}
       hideAnswerWhenVetoed={hideAnswerWhenVetoed}
+      vetoButtonClassName={vetoButtonClassName}
     >
       <div className="space-y-2">
         {q.enableMarkdown && !disabled && !readOnly && (

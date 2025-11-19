@@ -395,6 +395,53 @@ When `hideAnswerWhenVetoed` is enabled:
 - Unchecking the veto checkbox reveals the answer controls again
 - Previous answer values are preserved when toggling veto on/off
 
+### Customizing Veto Button Style
+
+You can customize the appearance of the veto button by providing a `vetoButtonClassName` function that returns different class names based on the veto state:
+
+```tsx
+import { QuestionRenderer } from '@lasercat/qna';
+
+function MyForm() {
+  return (
+    <QuestionRenderer
+      question={question}
+      response={responses[question.id]}
+      onChange={handleChange}
+      vetoButtonClassName={(isVetoed) =>
+        isVetoed
+          ? 'px-3 py-1 text-sm bg-red-500 text-white rounded-md hover:bg-red-600'
+          : 'px-3 py-1 text-sm bg-blue-500 text-white rounded-md hover:bg-blue-600'
+      }
+    />
+  );
+}
+```
+
+This also works with `QuestionGroup`:
+
+```tsx
+import { QuestionGroup } from '@lasercat/qna';
+
+function MyForm() {
+  return (
+    <QuestionGroup
+      group={group}
+      responses={responses}
+      onChange={handleChange}
+      vetoButtonClassName={(isVetoed) => (isVetoed ? 'custom-unveto-btn' : 'custom-veto-btn')}
+    />
+  );
+}
+```
+
+The function receives a boolean `isVetoed` parameter:
+
+- `true` - the question is currently vetoed (button shows "Unveto")
+- `false` - the question is not vetoed (button shows "Veto")
+
+**Note:** When providing custom classes, you'll need to handle all styling including hover states, disabled states, and transitions. If `vetoButtonClassName` is not provided, the default amber/gray styling is used.
+
 ## Question Groups
 
 Organize related questions into groups with progress tracking:

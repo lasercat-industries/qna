@@ -18,6 +18,7 @@ interface QuestionWrapperProps<T = unknown> {
   className?: string;
   renderQuestionText?: (question: AnyQuestion) => React.ReactNode;
   hideAnswerWhenVetoed?: boolean;
+  vetoButtonClassName?: (isVetoed: boolean) => string;
 }
 
 const getPriorityColor = (
@@ -115,6 +116,7 @@ export function QuestionWrapper<T = unknown>({
   className = '',
   renderQuestionText,
   hideAnswerWhenVetoed = false,
+  vetoButtonClassName,
 }: QuestionWrapperProps<T>) {
   const value = response?.value;
   const externalError = response?.errors?.[0];
@@ -122,7 +124,6 @@ export function QuestionWrapper<T = unknown>({
 
   const [internalError, setInternalError] = useState<string>('');
   const [isVetoed, setIsVetoed] = useState(externalVetoed);
-  const [showVetoReason, setShowVetoReason] = useState(false);
   const [vetoReason, setVetoReason] = useState(response?.vetoReason ?? '');
   const [touched, setTouched] = useState(false);
 
@@ -229,12 +230,13 @@ export function QuestionWrapper<T = unknown>({
   const showError = error && touched;
   const isDisabled = disabled || readOnly || isVetoed;
 
-  const handleVetoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newVetoed = e.target.checked;
+  const handleVetoToggle = () => {
+    if (disabled || readOnly) return;
+
+    const newVetoed = !isVetoed;
     setIsVetoed(newVetoed);
     if (!newVetoed) {
       setVetoReason('');
-      setShowVetoReason(false);
     }
 
     // Emit full response with veto update
@@ -310,7 +312,7 @@ export function QuestionWrapper<T = unknown>({
             <p className="text-sm text-gray-600 mb-2">{question.description}</p>
           )}
         </div>
-        <div className="flex gap-1 flex-wrap">
+        <div className="flex gap-1 flex-wrap items-center">
           {priorityStyle === 'chip' && (
             <span
               className={`px-2 py-1 text-xs rounded-full border ${getPriorityChipClass(question.priority)}`}
@@ -330,46 +332,43 @@ export function QuestionWrapper<T = unknown>({
                 {tag}
               </span>
             ))}
+          {question.allowVeto && (
+            <button
+              type="button"
+              onClick={handleVetoToggle}
+              disabled={disabled || readOnly}
+              className={
+                vetoButtonClassName
+                  ? vetoButtonClassName(isVetoed)
+                  : `
+                px-2 py-1 text-xs rounded-full border font-medium
+                transition-colors duration-200
+                ${
+                  isVetoed
+                    ? 'bg-amber-100 text-amber-700 border-amber-300 hover:bg-amber-200'
+                    : 'bg-gray-100 text-gray-700 border-gray-300 hover:bg-gray-200'
+                }
+                ${disabled || readOnly ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
+              `
+              }
+              title={isVetoed ? 'Click to unveto this question' : 'Click to veto this question'}
+            >
+              {isVetoed ? 'Unveto' : 'Veto'}
+            </button>
+          )}
         </div>
       </div>
 
-      {question.allowVeto && (
-        <div className="mb-3 p-3 bg-amber-50 border border-amber-200 rounded-md">
-          <label className="flex items-start gap-2 cursor-pointer">
-            <input
-              type="checkbox"
-              checked={isVetoed}
-              onChange={handleVetoChange}
-              className="mt-1 h-4 w-4 text-amber-600 border-amber-300 rounded focus:ring-amber-500"
-              disabled={disabled || readOnly}
-            />
-            <div className="flex-1">
-              <span className="text-sm font-medium text-amber-800">
-                {question.vetoLabel || 'This question is problematic'}
-              </span>
-              {isVetoed && (
-                <div className="mt-2">
-                  <button
-                    type="button"
-                    onClick={() => setShowVetoReason(!showVetoReason)}
-                    className="text-xs text-amber-700 hover:text-amber-900 underline"
-                  >
-                    {showVetoReason ? 'Hide' : 'Add'} reason (optional)
-                  </button>
-                  {showVetoReason && (
-                    <textarea
-                      value={vetoReason}
-                      onChange={handleVetoReasonChange}
-                      placeholder="Please explain why this question is problematic..."
-                      className="mt-2 w-full p-2 text-sm border border-amber-300 rounded-md focus:ring-amber-500 focus:border-amber-500"
-                      rows={2}
-                      disabled={disabled || readOnly}
-                    />
-                  )}
-                </div>
-              )}
-            </div>
-          </label>
+      {question.allowVeto && isVetoed && (
+        <div className="mb-3">
+          <textarea
+            value={vetoReason}
+            onChange={handleVetoReasonChange}
+            placeholder="Reason for veto (optional)"
+            className="w-full p-2 text-sm border border-amber-300 rounded-md bg-amber-50 focus:ring-amber-500 focus:border-amber-500"
+            rows={2}
+            disabled={disabled || readOnly}
+          />
         </div>
       )}
 
