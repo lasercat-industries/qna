@@ -114,18 +114,20 @@ export const MultipleChoice: React.FC<QuestionComponentProps<MultipleChoiceAnswe
       additionalTextMode === 'exclusive' &&
       additionalText.trim().length > 0;
 
-    // For radio buttons, use onClick to allow deselection
-    // For checkboxes, use normal onChange
-    const handleClick = q.multiple
-      ? undefined
-      : (e: React.MouseEvent) => {
-          if (disabled || readOnly || isDisabledByExclusiveMode) {
-            e.preventDefault();
-            return;
-          }
-          // For radio buttons, allow clicking to deselect
-          handleOptionChange(option.id);
-        };
+    // For radio buttons, we need to detect clicks on already-selected options to allow deselection
+    const handleLabelClick = (e: React.MouseEvent<HTMLLabelElement>) => {
+      if (disabled || readOnly || isDisabledByExclusiveMode) {
+        return;
+      }
+
+      // Only for radio buttons (single select)
+      if (!q.multiple && isSelected) {
+        // Clicking an already-selected radio button - deselect it
+        e.preventDefault();
+        handleOptionChange(option.id);
+      }
+      // For checkboxes or unselected radio buttons, let native behavior handle it
+    };
 
     return (
       <label
@@ -136,17 +138,17 @@ export const MultipleChoice: React.FC<QuestionComponentProps<MultipleChoiceAnswe
           ${isSelected ? 'bg-blue-50 border-blue-300' : 'bg-white border-gray-200'}
           ${disabled || readOnly || isDisabledByExclusiveMode ? 'opacity-60 cursor-not-allowed' : 'hover:bg-gray-50'}
         `}
-        onClick={handleClick}
+        onClick={handleLabelClick}
       >
         <input
           aria-label={option.label}
           checked={isSelected}
-          className={`mt-1 ${q.multiple ? '' : 'pointer-events-none'}`}
+          className="mt-1"
           disabled={disabled || readOnly || isDisabledByExclusiveMode}
           name={`question-${question.id}`}
           type={inputType}
           value={option.id}
-          onChange={q.multiple ? () => handleOptionChange(option.id) : () => {}}
+          onChange={() => handleOptionChange(option.id)}
         />
         <div className="flex-1">
           {option.image && (
