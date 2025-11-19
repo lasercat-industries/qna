@@ -395,9 +395,9 @@ When `hideAnswerWhenVetoed` is enabled:
 - Unchecking the veto checkbox reveals the answer controls again
 - Previous answer values are preserved when toggling veto on/off
 
-### Customizing Veto Button Style
+### Customizing Veto Button
 
-You can customize the appearance of the veto button by providing a `vetoButtonClassName` function that returns different class names based on the veto state:
+You can completely customize the veto button by providing a `renderVetoButton` function that renders your own button:
 
 ```tsx
 import { QuestionRenderer } from '@lasercat/qna';
@@ -408,11 +408,18 @@ function MyForm() {
       question={question}
       response={responses[question.id]}
       onChange={handleChange}
-      vetoButtonClassName={(isVetoed) =>
-        isVetoed
-          ? 'px-3 py-1 text-sm bg-red-500 text-white rounded-md hover:bg-red-600'
-          : 'px-3 py-1 text-sm bg-blue-500 text-white rounded-md hover:bg-blue-600'
-      }
+      renderVetoButton={(isVetoed, handleToggle) => (
+        <button
+          onClick={handleToggle}
+          className={
+            isVetoed
+              ? 'px-3 py-1 text-sm bg-red-500 text-white rounded-md hover:bg-red-600'
+              : 'px-3 py-1 text-sm bg-blue-500 text-white rounded-md hover:bg-blue-600'
+          }
+        >
+          {isVetoed ? '✓ Vetoed' : 'Flag Issue'}
+        </button>
+      )}
     />
   );
 }
@@ -429,18 +436,25 @@ function MyForm() {
       group={group}
       responses={responses}
       onChange={handleChange}
-      vetoButtonClassName={(isVetoed) => (isVetoed ? 'custom-unveto-btn' : 'custom-veto-btn')}
+      renderVetoButton={(isVetoed, handleToggle) => (
+        <span
+          onClick={handleToggle}
+          className="cursor-pointer text-xs underline"
+        >
+          {isVetoed ? 'Remove Flag' : 'Flag'}
+        </span>
+      )}
     />
   );
 }
 ```
 
-The function receives a boolean `isVetoed` parameter:
+The function receives two parameters:
 
-- `true` - the question is currently vetoed (button shows "Unveto")
-- `false` - the question is not vetoed (button shows "Veto")
+- `isVetoed` (boolean): `true` when the question is vetoed, `false` otherwise
+- `handleToggle` (function): Call this to toggle the veto state
 
-**Note:** When providing custom classes, you'll need to handle all styling including hover states, disabled states, and transitions. If `vetoButtonClassName` is not provided, the default amber/gray styling is used.
+**Note:** You have full control over the rendering - style it however you want, use any element (button, span, div, icon, etc.). If `renderVetoButton` is not provided, the default veto button is shown.
 
 ## Question Groups
 

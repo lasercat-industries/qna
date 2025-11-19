@@ -18,7 +18,7 @@ interface QuestionWrapperProps<T = unknown> {
   className?: string;
   renderQuestionText?: (question: AnyQuestion) => React.ReactNode;
   hideAnswerWhenVetoed?: boolean;
-  vetoButtonClassName?: (isVetoed: boolean) => string;
+  renderVetoButton?: (isVetoed: boolean, handleToggle: () => void) => React.ReactNode;
 }
 
 const getPriorityColor = (
@@ -116,7 +116,7 @@ export function QuestionWrapper<T = unknown>({
   className = '',
   renderQuestionText,
   hideAnswerWhenVetoed = false,
-  vetoButtonClassName,
+  renderVetoButton,
 }: QuestionWrapperProps<T>) {
   const value = response?.value;
   const externalError = response?.errors?.[0];
@@ -310,30 +310,29 @@ export function QuestionWrapper<T = unknown>({
               {renderQuestionText ? renderQuestionText(question as AnyQuestion) : question.text}
             </label>
             <div className="flex-grow"></div>
-            {question.allowVeto && (
-              <button
-                type="button"
-                onClick={handleVetoToggle}
-                disabled={disabled || readOnly}
-                className={
-                  vetoButtonClassName
-                    ? vetoButtonClassName(isVetoed)
-                    : `
-                  px-2 py-1 text-xs rounded-full border font-medium
-                  transition-colors duration-200
-                  ${
-                    isVetoed
-                      ? 'bg-amber-100 text-amber-700 border-amber-300 hover:bg-amber-200'
-                      : 'bg-gray-100 text-gray-700 border-gray-300 hover:bg-gray-200'
-                  }
-                  ${disabled || readOnly ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
-                `
-                }
-                title={isVetoed ? 'Click to unveto this question' : 'Click to veto this question'}
-              >
-                {isVetoed ? 'Unveto' : 'Veto'}
-              </button>
-            )}
+            {question.allowVeto &&
+              (renderVetoButton ? (
+                renderVetoButton(isVetoed, handleVetoToggle)
+              ) : (
+                <button
+                  type="button"
+                  onClick={handleVetoToggle}
+                  disabled={disabled || readOnly}
+                  className={`
+                    px-2 py-1 text-xs rounded-full border font-medium
+                    transition-colors duration-200
+                    ${
+                      isVetoed
+                        ? 'bg-amber-100 text-amber-700 border-amber-300 hover:bg-amber-200'
+                        : 'bg-gray-100 text-gray-700 border-gray-300 hover:bg-gray-200'
+                    }
+                    ${disabled || readOnly ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
+                  `}
+                  title={isVetoed ? 'Click to unveto this question' : 'Click to veto this question'}
+                >
+                  {isVetoed ? 'Unveto' : 'Veto'}
+                </button>
+              ))}
           </div>
           <div className="flex gap-1 flex-wrap items-center mb-2">
             {priorityStyle === 'chip' && (
@@ -380,22 +379,24 @@ export function QuestionWrapper<T = unknown>({
 
       <div
         className={`
-          overflow-hidden transition-all duration-300 ease-in-out
-          ${hideAnswerWhenVetoed && isVetoed ? 'max-h-0 opacity-0' : 'max-h-[2000px] opacity-100'}
+          grid transition-all duration-300 ease-in-out
+          ${hideAnswerWhenVetoed && isVetoed ? 'grid-rows-[0fr] opacity-0' : 'grid-rows-[1fr] opacity-100'}
         `}
       >
-        <div
-          className={`
-            question-content
-            ${priorityStyle === 'border-all' ? '' : priorityStyle === 'background' ? 'p-4' : 'p-3'}
-            ${getPriorityColor(question.priority, priorityStyle)}
-            ${showError ? 'bg-red-50' : priorityStyle === 'background' ? '' : priorityStyle === 'border-all' ? '' : 'bg-white'}
-            ${isVetoed && !hideAnswerWhenVetoed ? 'opacity-50 pointer-events-none' : ''}
-            ${priorityStyle === 'border-all' ? '' : 'rounded-md'}
-          `}
-          onBlur={handleBlur}
-        >
-          {children}
+        <div className="min-h-0 overflow-hidden">
+          <div
+            className={`
+              question-content
+              ${priorityStyle === 'border-all' ? '' : priorityStyle === 'background' ? 'p-4' : 'p-3'}
+              ${getPriorityColor(question.priority, priorityStyle)}
+              ${showError ? 'bg-red-50' : priorityStyle === 'background' ? '' : priorityStyle === 'border-all' ? '' : 'bg-white'}
+              ${isVetoed && !hideAnswerWhenVetoed ? 'opacity-50 pointer-events-none' : ''}
+              ${priorityStyle === 'border-all' ? '' : 'rounded-md'}
+            `}
+            onBlur={handleBlur}
+          >
+            {children}
+          </div>
         </div>
       </div>
 

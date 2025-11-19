@@ -12,7 +12,7 @@ interface QuestionGroupProps {
   className?: string;
   renderQuestionText?: (question: AnyQuestion) => React.ReactNode;
   hideAnswerWhenVetoed?: boolean;
-  vetoButtonClassName?: (isVetoed: boolean) => string;
+  renderVetoButton?: (isVetoed: boolean, handleToggle: () => void) => React.ReactNode;
 }
 
 const getPriorityBadge = (priority: Priority) => {
@@ -40,7 +40,7 @@ export const QuestionGroup: React.FC<QuestionGroupProps> = ({
   className = '',
   renderQuestionText,
   hideAnswerWhenVetoed,
-  vetoButtonClassName,
+  renderVetoButton,
 }) => {
   const [isExpanded, setIsExpanded] = useState(group.defaultExpanded ?? true);
   const [completedQuestions, setCompletedQuestions] = useState<Set<string>>(new Set());
@@ -199,7 +199,7 @@ export const QuestionGroup: React.FC<QuestionGroupProps> = ({
                   onChange={handleQuestionChange}
                   renderQuestionText={renderQuestionText}
                   hideAnswerWhenVetoed={hideAnswerWhenVetoed}
-                  vetoButtonClassName={vetoButtonClassName}
+                  renderVetoButton={renderVetoButton}
                 />
               </div>
             );

@@ -29,7 +29,7 @@ interface QuestionRendererProps<T = unknown> {
   className?: string;
   renderQuestionText?: (question: AnyQuestion) => React.ReactNode;
   hideAnswerWhenVetoed?: boolean;
-  vetoButtonClassName?: (isVetoed: boolean) => string;
+  renderVetoButton?: (isVetoed: boolean, handleToggle: () => void) => React.ReactNode;
 }
 
 export const QuestionRenderer: React.FC<QuestionRendererProps> = ({
@@ -42,7 +42,7 @@ export const QuestionRenderer: React.FC<QuestionRendererProps> = ({
   className,
   renderQuestionText,
   hideAnswerWhenVetoed,
-  vetoButtonClassName,
+  renderVetoButton,
 }) => {
   // Props are passed directly to each component with proper typing
 
@@ -59,7 +59,7 @@ export const QuestionRenderer: React.FC<QuestionRendererProps> = ({
           className={className}
           renderQuestionText={renderQuestionText}
           hideAnswerWhenVetoed={hideAnswerWhenVetoed}
-          vetoButtonClassName={vetoButtonClassName}
+          renderVetoButton={renderVetoButton}
         />
       );
 
@@ -75,7 +75,7 @@ export const QuestionRenderer: React.FC<QuestionRendererProps> = ({
           className={className}
           renderQuestionText={renderQuestionText}
           hideAnswerWhenVetoed={hideAnswerWhenVetoed}
-          vetoButtonClassName={vetoButtonClassName}
+          renderVetoButton={renderVetoButton}
         />
       );
 
@@ -91,7 +91,7 @@ export const QuestionRenderer: React.FC<QuestionRendererProps> = ({
           className={className}
           renderQuestionText={renderQuestionText}
           hideAnswerWhenVetoed={hideAnswerWhenVetoed}
-          vetoButtonClassName={vetoButtonClassName}
+          renderVetoButton={renderVetoButton}
         />
       );
 
@@ -107,7 +107,7 @@ export const QuestionRenderer: React.FC<QuestionRendererProps> = ({
           className={className}
           renderQuestionText={renderQuestionText}
           hideAnswerWhenVetoed={hideAnswerWhenVetoed}
-          vetoButtonClassName={vetoButtonClassName}
+          renderVetoButton={renderVetoButton}
         />
       );
 
@@ -123,7 +123,7 @@ export const QuestionRenderer: React.FC<QuestionRendererProps> = ({
           className={className}
           renderQuestionText={renderQuestionText}
           hideAnswerWhenVetoed={hideAnswerWhenVetoed}
-          vetoButtonClassName={vetoButtonClassName}
+          renderVetoButton={renderVetoButton}
         />
       );
 
@@ -139,7 +139,7 @@ export const QuestionRenderer: React.FC<QuestionRendererProps> = ({
           className={className}
           renderQuestionText={renderQuestionText}
           hideAnswerWhenVetoed={hideAnswerWhenVetoed}
-          vetoButtonClassName={vetoButtonClassName}
+          renderVetoButton={renderVetoButton}
         />
       );
 
@@ -155,7 +155,7 @@ export const QuestionRenderer: React.FC<QuestionRendererProps> = ({
           className={className}
           renderQuestionText={renderQuestionText}
           hideAnswerWhenVetoed={hideAnswerWhenVetoed}
-          vetoButtonClassName={vetoButtonClassName}
+          renderVetoButton={renderVetoButton}
         />
       );
 

@@ -12,7 +12,7 @@ export const ShortAnswer: React.FC<QuestionComponentProps<string>> = ({
   className = '',
   renderQuestionText,
   hideAnswerWhenVetoed,
-  vetoButtonClassName,
+  renderVetoButton,
 }) => {
   const q = question as ShortAnswerQuestion;
   const value = response?.value ?? '';
@@ -84,7 +84,7 @@ export const ShortAnswer: React.FC<QuestionComponentProps<string>> = ({
       onValidate={onValidate}
       renderQuestionText={renderQuestionText}
       hideAnswerWhenVetoed={hideAnswerWhenVetoed}
-      vetoButtonClassName={vetoButtonClassName}
+      renderVetoButton={renderVetoButton}
     >
       <div className="relative">
         <input
