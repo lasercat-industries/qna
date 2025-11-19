@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import type { QuestionGroupType, QuestionResponse, Priority } from '../types';
+import type { QuestionGroupType, QuestionResponse, Priority, AnyQuestion } from '../types';
 import QuestionRenderer from './QuestionRenderer';
 
 interface QuestionGroupProps {
@@ -10,6 +10,7 @@ interface QuestionGroupProps {
   disabled?: boolean;
   readOnly?: boolean;
   className?: string;
+  renderQuestionText?: (question: AnyQuestion) => React.ReactNode;
 }
 
 const getPriorityBadge = (priority: Priority) => {
@@ -35,6 +36,7 @@ export const QuestionGroup: React.FC<QuestionGroupProps> = ({
   disabled = false,
   readOnly = false,
   className = '',
+  renderQuestionText,
 }) => {
   const [isExpanded, setIsExpanded] = useState(group.defaultExpanded ?? true);
   const [completedQuestions, setCompletedQuestions] = useState<Set<string>>(new Set());
@@ -191,6 +193,7 @@ export const QuestionGroup: React.FC<QuestionGroupProps> = ({
                   readOnly={readOnly}
                   response={response}
                   onChange={handleQuestionChange}
+                  renderQuestionText={renderQuestionText}
                 />
               </div>
             );

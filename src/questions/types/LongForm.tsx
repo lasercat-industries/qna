@@ -10,6 +10,7 @@ export const LongForm: React.FC<QuestionComponentProps<string>> = ({
   disabled = false,
   readOnly = false,
   className = '',
+  renderQuestionText,
 }) => {
   const q = question as LongFormQuestion;
   const value = response?.value ?? '';
@@ -112,6 +113,7 @@ export const LongForm: React.FC<QuestionComponentProps<string>> = ({
       response={response}
       onChange={onChange}
       onValidate={onValidate}
+      renderQuestionText={renderQuestionText}
     >
       <div className="space-y-2">
         {q.enableMarkdown && !disabled && !readOnly && (

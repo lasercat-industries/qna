@@ -10,6 +10,7 @@ export const TrueFalse: React.FC<QuestionComponentProps<boolean | undefined>> = 
   disabled = false,
   readOnly = false,
   className = '',
+  renderQuestionText,
 }) => {
   const q = question as TrueFalseQuestion;
   const value = response?.value ?? q.defaultValue;
@@ -182,6 +183,7 @@ export const TrueFalse: React.FC<QuestionComponentProps<boolean | undefined>> = 
       response={response}
       onChange={onChange}
       onValidate={onValidate}
+      renderQuestionText={renderQuestionText}
     >
       {displayStyle === 'toggle' && renderToggle()}
       {displayStyle === 'radio' && renderRadio()}

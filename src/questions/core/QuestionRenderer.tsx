@@ -27,6 +27,7 @@ interface QuestionRendererProps<T = unknown> {
   disabled?: boolean;
   readOnly?: boolean;
   className?: string;
+  renderQuestionText?: (question: AnyQuestion) => React.ReactNode;
 }
 
 export const QuestionRenderer: React.FC<QuestionRendererProps> = ({
@@ -37,6 +38,7 @@ export const QuestionRenderer: React.FC<QuestionRendererProps> = ({
   disabled,
   readOnly,
   className,
+  renderQuestionText,
 }) => {
   // Props are passed directly to each component with proper typing
 
@@ -51,6 +53,7 @@ export const QuestionRenderer: React.FC<QuestionRendererProps> = ({
           disabled={disabled}
           readOnly={readOnly}
           className={className}
+          renderQuestionText={renderQuestionText}
         />
       );
 
@@ -64,6 +67,7 @@ export const QuestionRenderer: React.FC<QuestionRendererProps> = ({
           disabled={disabled}
           readOnly={readOnly}
           className={className}
+          renderQuestionText={renderQuestionText}
         />
       );
 
@@ -77,6 +81,7 @@ export const QuestionRenderer: React.FC<QuestionRendererProps> = ({
           disabled={disabled}
           readOnly={readOnly}
           className={className}
+          renderQuestionText={renderQuestionText}
         />
       );
 
@@ -90,6 +95,7 @@ export const QuestionRenderer: React.FC<QuestionRendererProps> = ({
           disabled={disabled}
           readOnly={readOnly}
           className={className}
+          renderQuestionText={renderQuestionText}
         />
       );
 
@@ -103,6 +109,7 @@ export const QuestionRenderer: React.FC<QuestionRendererProps> = ({
           disabled={disabled}
           readOnly={readOnly}
           className={className}
+          renderQuestionText={renderQuestionText}
         />
       );
 
@@ -116,6 +123,7 @@ export const QuestionRenderer: React.FC<QuestionRendererProps> = ({
           disabled={disabled}
           readOnly={readOnly}
           className={className}
+          renderQuestionText={renderQuestionText}
         />
       );
 
@@ -129,6 +137,7 @@ export const QuestionRenderer: React.FC<QuestionRendererProps> = ({
           disabled={disabled}
           readOnly={readOnly}
           className={className}
+          renderQuestionText={renderQuestionText}
         />
       );
 

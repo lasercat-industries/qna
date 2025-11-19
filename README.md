@@ -394,6 +394,101 @@ function MyForm() {
 }
 ```
 
+## Custom Question Text Rendering
+
+The `renderQuestionText` prop allows you to customize how question text is displayed. This is useful for adding inline badges, icons, or other custom content within the question text.
+
+### Basic Example
+
+```tsx
+import { QuestionRenderer } from '@lasercat/qna';
+import type { AnyQuestion, QuestionResponse } from '@lasercat/qna';
+
+function MyForm() {
+  const [responses, setResponses] = useState<Record<string, QuestionResponse>>({});
+
+  const handleChange = (response: QuestionResponse) => {
+    setResponses((prev) => ({
+      ...prev,
+      [response.questionId]: response,
+    }));
+  };
+
+  return (
+    <QuestionRenderer
+      question={question}
+      response={responses[question.id]}
+      onChange={handleChange}
+      renderQuestionText={(q) => (
+        <span>
+          {q.text}{' '}
+          <span className="ml-2 px-2 py-0.5 text-xs rounded bg-blue-100 text-blue-700">NEW</span>
+        </span>
+      )}
+    />
+  );
+}
+```
+
+### Advanced Example with Conditional Badges
+
+You can use the question object to conditionally render different content:
+
+```tsx
+function MyForm() {
+  const renderQuestionText = (question: AnyQuestion) => {
+    return (
+      <span className="flex items-center gap-2">
+        <span>{question.text}</span>
+        {question.priority === 'critical' && (
+          <span className="px-2 py-0.5 text-xs rounded bg-red-100 text-red-700 font-semibold">
+            URGENT
+          </span>
+        )}
+        {question.tags.includes('beta') && (
+          <span className="px-2 py-0.5 text-xs rounded bg-purple-100 text-purple-700">BETA</span>
+        )}
+      </span>
+    );
+  };
+
+  return (
+    <QuestionRenderer
+      question={question}
+      response={responses[question.id]}
+      onChange={handleChange}
+      renderQuestionText={renderQuestionText}
+    />
+  );
+}
+```
+
+### With Question Groups
+
+The `renderQuestionText` prop also works with `QuestionGroup`:
+
+```tsx
+import { QuestionGroup } from '@lasercat/qna';
+
+function MyForm() {
+  return (
+    <QuestionGroup
+      group={group}
+      responses={responses}
+      onChange={handleChange}
+      renderQuestionText={(q) => (
+        <span>
+          {q.text}
+          {q.required && <span className="ml-1 text-red-500">*</span>}
+        </span>
+      )}
+    />
+  );
+}
+```
+
+**Note**: The `renderQuestionText` function receives the full question object, giving you access to all question properties including `id`, `type`, `priority`, `tags`, and type-specific properties.
+
 ## Development
 
 ### Running Tests

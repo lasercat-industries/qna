@@ -15,6 +15,7 @@ export const MultipleChoice: React.FC<QuestionComponentProps<MultipleChoiceAnswe
   disabled = false,
   readOnly = false,
   className = '',
+  renderQuestionText,
 }) => {
   const q = question as MultipleChoiceQuestion;
   const additionalTextMode = q.additionalTextMode || 'additional';
@@ -163,6 +164,7 @@ export const MultipleChoice: React.FC<QuestionComponentProps<MultipleChoiceAnswe
       response={response}
       onChange={onChange}
       onValidate={onValidate}
+      renderQuestionText={renderQuestionText}
     >
       <div className="space-y-3">
         <div className={`grid ${gridClass} gap-2`}>{q.options.map(renderOption)}</div>

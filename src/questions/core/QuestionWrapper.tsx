@@ -1,5 +1,11 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import type { Question, Priority, PriorityDisplayStyle, QuestionResponse } from '../types';
+import type {
+  Question,
+  Priority,
+  PriorityDisplayStyle,
+  QuestionResponse,
+  AnyQuestion,
+} from '../types';
 
 interface QuestionWrapperProps<T = unknown> {
   question: Question<T>;
@@ -10,6 +16,7 @@ interface QuestionWrapperProps<T = unknown> {
   disabled?: boolean;
   readOnly?: boolean;
   className?: string;
+  renderQuestionText?: (question: AnyQuestion) => React.ReactNode;
 }
 
 const getPriorityColor = (
@@ -105,6 +112,7 @@ export function QuestionWrapper<T = unknown>({
   disabled = false,
   readOnly = false,
   className = '',
+  renderQuestionText,
 }: QuestionWrapperProps<T>) {
   const value = response?.value;
   const externalError = response?.errors?.[0];
@@ -293,7 +301,9 @@ export function QuestionWrapper<T = unknown>({
           </span>
         )}
         <div className="flex-1">
-          <label className="block text-sm font-medium text-gray-700 mb-1">{question.text}</label>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            {renderQuestionText ? renderQuestionText(question as AnyQuestion) : question.text}
+          </label>
           {question.description && (
             <p className="text-sm text-gray-600 mb-2">{question.description}</p>
           )}

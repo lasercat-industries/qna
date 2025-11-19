@@ -1,3 +1,5 @@
+import type React from 'react';
+
 export type QuestionType =
   | 'short-answer'
   | 'long-form'
@@ -196,4 +198,5 @@ export interface QuestionComponentProps<T = unknown> {
   disabled?: boolean;
   readOnly?: boolean;
   className?: string;
+  renderQuestionText?: (question: AnyQuestion) => React.ReactNode;
 }
