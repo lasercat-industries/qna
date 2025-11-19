@@ -28,6 +28,7 @@ interface QuestionRendererProps<T = unknown> {
   readOnly?: boolean;
   className?: string;
   renderQuestionText?: (question: AnyQuestion) => React.ReactNode;
+  hideAnswerWhenVetoed?: boolean;
 }
 
 export const QuestionRenderer: React.FC<QuestionRendererProps> = ({
@@ -39,6 +40,7 @@ export const QuestionRenderer: React.FC<QuestionRendererProps> = ({
   readOnly,
   className,
   renderQuestionText,
+  hideAnswerWhenVetoed,
 }) => {
   // Props are passed directly to each component with proper typing
 
@@ -54,6 +56,7 @@ export const QuestionRenderer: React.FC<QuestionRendererProps> = ({
           readOnly={readOnly}
           className={className}
           renderQuestionText={renderQuestionText}
+          hideAnswerWhenVetoed={hideAnswerWhenVetoed}
         />
       );
 
@@ -68,6 +71,7 @@ export const QuestionRenderer: React.FC<QuestionRendererProps> = ({
           readOnly={readOnly}
           className={className}
           renderQuestionText={renderQuestionText}
+          hideAnswerWhenVetoed={hideAnswerWhenVetoed}
         />
       );
 
@@ -82,6 +86,7 @@ export const QuestionRenderer: React.FC<QuestionRendererProps> = ({
           readOnly={readOnly}
           className={className}
           renderQuestionText={renderQuestionText}
+          hideAnswerWhenVetoed={hideAnswerWhenVetoed}
         />
       );
 
@@ -96,6 +101,7 @@ export const QuestionRenderer: React.FC<QuestionRendererProps> = ({
           readOnly={readOnly}
           className={className}
           renderQuestionText={renderQuestionText}
+          hideAnswerWhenVetoed={hideAnswerWhenVetoed}
         />
       );
 
@@ -110,6 +116,7 @@ export const QuestionRenderer: React.FC<QuestionRendererProps> = ({
           readOnly={readOnly}
           className={className}
           renderQuestionText={renderQuestionText}
+          hideAnswerWhenVetoed={hideAnswerWhenVetoed}
         />
       );
 
@@ -124,6 +131,7 @@ export const QuestionRenderer: React.FC<QuestionRendererProps> = ({
           readOnly={readOnly}
           className={className}
           renderQuestionText={renderQuestionText}
+          hideAnswerWhenVetoed={hideAnswerWhenVetoed}
         />
       );
 
@@ -138,6 +146,7 @@ export const QuestionRenderer: React.FC<QuestionRendererProps> = ({
           readOnly={readOnly}
           className={className}
           renderQuestionText={renderQuestionText}
+          hideAnswerWhenVetoed={hideAnswerWhenVetoed}
         />
       );
 

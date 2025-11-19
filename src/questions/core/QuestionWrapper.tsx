@@ -17,6 +17,7 @@ interface QuestionWrapperProps<T = unknown> {
   readOnly?: boolean;
   className?: string;
   renderQuestionText?: (question: AnyQuestion) => React.ReactNode;
+  hideAnswerWhenVetoed?: boolean;
 }
 
 const getPriorityColor = (
@@ -113,6 +114,7 @@ export function QuestionWrapper<T = unknown>({
   readOnly = false,
   className = '',
   renderQuestionText,
+  hideAnswerWhenVetoed = false,
 }: QuestionWrapperProps<T>) {
   const value = response?.value;
   const externalError = response?.errors?.[0];
@@ -371,19 +373,21 @@ export function QuestionWrapper<T = unknown>({
         </div>
       )}
 
-      <div
-        className={`
-          question-content 
-          ${priorityStyle === 'border-all' ? '' : priorityStyle === 'background' ? 'p-4' : 'p-3'}
-          ${getPriorityColor(question.priority, priorityStyle)}
-          ${showError ? 'bg-red-50' : priorityStyle === 'background' ? '' : priorityStyle === 'border-all' ? '' : 'bg-white'}
-          ${isVetoed ? 'opacity-50 pointer-events-none' : ''}
-          ${priorityStyle === 'border-all' ? '' : 'rounded-md'}
-        `}
-        onBlur={handleBlur}
-      >
-        {children}
-      </div>
+      {!(hideAnswerWhenVetoed && isVetoed) && (
+        <div
+          className={`
+            question-content
+            ${priorityStyle === 'border-all' ? '' : priorityStyle === 'background' ? 'p-4' : 'p-3'}
+            ${getPriorityColor(question.priority, priorityStyle)}
+            ${showError ? 'bg-red-50' : priorityStyle === 'background' ? '' : priorityStyle === 'border-all' ? '' : 'bg-white'}
+            ${isVetoed ? 'opacity-50 pointer-events-none' : ''}
+            ${priorityStyle === 'border-all' ? '' : 'rounded-md'}
+          `}
+          onBlur={handleBlur}
+        >
+          {children}
+        </div>
+      )}
 
       {isVetoed && (
         <div className="mt-2 text-sm text-amber-600 font-medium" role="alert">

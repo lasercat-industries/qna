@@ -11,6 +11,7 @@ export const Slider: React.FC<QuestionComponentProps<number | [number, number]>>
   readOnly = false,
   className = '',
   renderQuestionText,
+  hideAnswerWhenVetoed,
 }) => {
   const q = question as SliderQuestion;
   const defaultValue = useMemo(
@@ -153,6 +154,7 @@ export const Slider: React.FC<QuestionComponentProps<number | [number, number]>>
         onChange={onChange as (response: QuestionResponse<[number, number]>) => void}
         onValidate={onValidate as ((value: [number, number]) => string[]) | undefined}
         renderQuestionText={renderQuestionText}
+        hideAnswerWhenVetoed={hideAnswerWhenVetoed}
       >
         <div className="space-y-4">
           <div
@@ -313,6 +315,7 @@ export const Slider: React.FC<QuestionComponentProps<number | [number, number]>>
       onChange={onChange as (response: QuestionResponse<number>) => void}
       onValidate={onValidate as ((value: number) => string[]) | undefined}
       renderQuestionText={renderQuestionText}
+      hideAnswerWhenVetoed={hideAnswerWhenVetoed}
     >
       <div className="space-y-4">
         <div className="relative pt-6 pb-2 px-4">

@@ -11,6 +11,7 @@ interface QuestionGroupProps {
   readOnly?: boolean;
   className?: string;
   renderQuestionText?: (question: AnyQuestion) => React.ReactNode;
+  hideAnswerWhenVetoed?: boolean;
 }
 
 const getPriorityBadge = (priority: Priority) => {
@@ -37,6 +38,7 @@ export const QuestionGroup: React.FC<QuestionGroupProps> = ({
   readOnly = false,
   className = '',
   renderQuestionText,
+  hideAnswerWhenVetoed,
 }) => {
   const [isExpanded, setIsExpanded] = useState(group.defaultExpanded ?? true);
   const [completedQuestions, setCompletedQuestions] = useState<Set<string>>(new Set());
@@ -194,6 +196,7 @@ export const QuestionGroup: React.FC<QuestionGroupProps> = ({
                   response={response}
                   onChange={handleQuestionChange}
                   renderQuestionText={renderQuestionText}
+                  hideAnswerWhenVetoed={hideAnswerWhenVetoed}
                 />
               </div>
             );
