@@ -11,7 +11,6 @@ export const TrueFalse: React.FC<QuestionComponentProps<boolean | undefined>> = 
   readOnly = false,
   className = '',
   renderQuestionText,
-  hideAnswerWhenVetoed,
   renderVetoButton,
 }) => {
   const q = question as TrueFalseQuestion;
@@ -186,7 +185,6 @@ export const TrueFalse: React.FC<QuestionComponentProps<boolean | undefined>> = 
       onChange={onChange}
       onValidate={onValidate}
       renderQuestionText={renderQuestionText}
-      hideAnswerWhenVetoed={hideAnswerWhenVetoed}
       renderVetoButton={renderVetoButton}
     >
       {displayStyle === 'toggle' && renderToggle()}

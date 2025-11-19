@@ -11,7 +11,6 @@ export const StackRanking: React.FC<QuestionComponentProps<string[]>> = ({
   readOnly = false,
   className = '',
   renderQuestionText,
-  hideAnswerWhenVetoed,
   renderVetoButton,
 }) => {
   const q = question as StackRankingQuestion;
@@ -177,7 +176,6 @@ export const StackRanking: React.FC<QuestionComponentProps<string[]>> = ({
       onChange={onChange}
       onValidate={onValidate}
       renderQuestionText={renderQuestionText}
-      hideAnswerWhenVetoed={hideAnswerWhenVetoed}
       renderVetoButton={renderVetoButton}
     >
       <div className="space-y-2">

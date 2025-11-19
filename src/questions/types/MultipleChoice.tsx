@@ -16,7 +16,6 @@ export const MultipleChoice: React.FC<QuestionComponentProps<MultipleChoiceAnswe
   readOnly = false,
   className = '',
   renderQuestionText,
-  hideAnswerWhenVetoed,
   renderVetoButton,
 }) => {
   const q = question as MultipleChoiceQuestion;
@@ -183,7 +182,6 @@ export const MultipleChoice: React.FC<QuestionComponentProps<MultipleChoiceAnswe
       onChange={onChange}
       onValidate={onValidate}
       renderQuestionText={renderQuestionText}
-      hideAnswerWhenVetoed={hideAnswerWhenVetoed}
       renderVetoButton={renderVetoButton}
     >
       <div className="space-y-3">

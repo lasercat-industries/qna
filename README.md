@@ -352,49 +352,6 @@ const finalResponses = Object.entries(responses)
 const allResponses = responses; // Includes vetoed with { vetoed: true, vetoReason: "..." }
 ```
 
-### Hiding Answer Controls When Vetoed
-
-By default, vetoed questions show their answer controls in a disabled/grayed-out state. You can configure the form to completely hide answer controls when a question is vetoed:
-
-```tsx
-import { QuestionRenderer } from '@lasercat/qna';
-
-function MyForm() {
-  return (
-    <QuestionRenderer
-      question={question}
-      response={responses[question.id]}
-      onChange={handleChange}
-      hideAnswerWhenVetoed={true} // Hide answer controls when vetoed
-    />
-  );
-}
-```
-
-This also works with `QuestionGroup`:
-
-```tsx
-import { QuestionGroup } from '@lasercat/qna';
-
-function MyForm() {
-  return (
-    <QuestionGroup
-      group={group}
-      responses={responses}
-      onChange={handleChange}
-      hideAnswerWhenVetoed={true} // Hide all answer controls when vetoed
-    />
-  );
-}
-```
-
-When `hideAnswerWhenVetoed` is enabled:
-
-- Checking the veto checkbox hides the answer input/controls
-- Only the question text, veto checkbox, and veto message remain visible
-- Unchecking the veto checkbox reveals the answer controls again
-- Previous answer values are preserved when toggling veto on/off
-
 ### Customizing Veto Button
 
 You can completely customize the veto button by providing a `renderVetoButton` function that renders your own button:

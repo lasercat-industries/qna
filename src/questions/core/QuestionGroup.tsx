@@ -11,7 +11,6 @@ interface QuestionGroupProps {
   readOnly?: boolean;
   className?: string;
   renderQuestionText?: (question: AnyQuestion) => React.ReactNode;
-  hideAnswerWhenVetoed?: boolean;
   renderVetoButton?: (isVetoed: boolean, handleToggle: () => void) => React.ReactNode;
 }
 
@@ -39,7 +38,6 @@ export const QuestionGroup: React.FC<QuestionGroupProps> = ({
   readOnly = false,
   className = '',
   renderQuestionText,
-  hideAnswerWhenVetoed,
   renderVetoButton,
 }) => {
   const [isExpanded, setIsExpanded] = useState(group.defaultExpanded ?? true);
@@ -198,7 +196,6 @@ export const QuestionGroup: React.FC<QuestionGroupProps> = ({
                   response={response}
                   onChange={handleQuestionChange}
                   renderQuestionText={renderQuestionText}
-                  hideAnswerWhenVetoed={hideAnswerWhenVetoed}
                   renderVetoButton={renderVetoButton}
                 />
               </div>

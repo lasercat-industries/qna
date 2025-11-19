@@ -11,7 +11,6 @@ export const LongForm: React.FC<QuestionComponentProps<string>> = ({
   readOnly = false,
   className = '',
   renderQuestionText,
-  hideAnswerWhenVetoed,
   renderVetoButton,
 }) => {
   const q = question as LongFormQuestion;
@@ -116,7 +115,6 @@ export const LongForm: React.FC<QuestionComponentProps<string>> = ({
       onChange={onChange}
       onValidate={onValidate}
       renderQuestionText={renderQuestionText}
-      hideAnswerWhenVetoed={hideAnswerWhenVetoed}
       renderVetoButton={renderVetoButton}
     >
       <div className="space-y-2">

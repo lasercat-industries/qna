@@ -17,7 +17,6 @@ interface QuestionWrapperProps<T = unknown> {
   readOnly?: boolean;
   className?: string;
   renderQuestionText?: (question: AnyQuestion) => React.ReactNode;
-  hideAnswerWhenVetoed?: boolean;
   renderVetoButton?: (isVetoed: boolean, handleToggle: () => void) => React.ReactNode;
 }
 
@@ -115,7 +114,6 @@ export function QuestionWrapper<T = unknown>({
   readOnly = false,
   className = '',
   renderQuestionText,
-  hideAnswerWhenVetoed = false,
   renderVetoButton,
 }: QuestionWrapperProps<T>) {
   const value = response?.value;
@@ -379,25 +377,16 @@ export function QuestionWrapper<T = unknown>({
 
       <div
         className={`
-          grid transition-all duration-300 ease-in-out
-          ${hideAnswerWhenVetoed && isVetoed ? 'grid-rows-[0fr] opacity-0' : 'grid-rows-[1fr] opacity-100'}
+          question-content
+          ${priorityStyle === 'border-all' ? '' : priorityStyle === 'background' ? 'p-4' : 'p-3'}
+          ${getPriorityColor(question.priority, priorityStyle)}
+          ${showError ? 'bg-red-50' : priorityStyle === 'background' ? '' : priorityStyle === 'border-all' ? '' : 'bg-white'}
+          ${isVetoed ? 'opacity-50 pointer-events-none' : ''}
+          ${priorityStyle === 'border-all' ? '' : 'rounded-md'}
         `}
+        onBlur={handleBlur}
       >
-        <div className="min-h-0 overflow-hidden">
-          <div
-            className={`
-              question-content
-              ${priorityStyle === 'border-all' ? '' : priorityStyle === 'background' ? 'p-4' : 'p-3'}
-              ${getPriorityColor(question.priority, priorityStyle)}
-              ${showError ? 'bg-red-50' : priorityStyle === 'background' ? '' : priorityStyle === 'border-all' ? '' : 'bg-white'}
-              ${isVetoed && !hideAnswerWhenVetoed ? 'opacity-50 pointer-events-none' : ''}
-              ${priorityStyle === 'border-all' ? '' : 'rounded-md'}
-            `}
-            onBlur={handleBlur}
-          >
-            {children}
-          </div>
-        </div>
+        {children}
       </div>
 
       {isVetoed && (

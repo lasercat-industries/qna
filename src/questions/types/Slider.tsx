@@ -11,7 +11,6 @@ export const Slider: React.FC<QuestionComponentProps<number | [number, number]>>
   readOnly = false,
   className = '',
   renderQuestionText,
-  hideAnswerWhenVetoed,
   renderVetoButton,
 }) => {
   const q = question as SliderQuestion;
@@ -155,7 +154,6 @@ export const Slider: React.FC<QuestionComponentProps<number | [number, number]>>
         onChange={onChange as (response: QuestionResponse<[number, number]>) => void}
         onValidate={onValidate as ((value: [number, number]) => string[]) | undefined}
         renderQuestionText={renderQuestionText}
-        hideAnswerWhenVetoed={hideAnswerWhenVetoed}
         renderVetoButton={renderVetoButton}
       >
         <div className="space-y-4">
@@ -317,7 +315,6 @@ export const Slider: React.FC<QuestionComponentProps<number | [number, number]>>
       onChange={onChange as (response: QuestionResponse<number>) => void}
       onValidate={onValidate as ((value: number) => string[]) | undefined}
       renderQuestionText={renderQuestionText}
-      hideAnswerWhenVetoed={hideAnswerWhenVetoed}
       renderVetoButton={renderVetoButton}
     >
       <div className="space-y-4">

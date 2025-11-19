@@ -11,7 +11,6 @@ export const ShortAnswer: React.FC<QuestionComponentProps<string>> = ({
   readOnly = false,
   className = '',
   renderQuestionText,
-  hideAnswerWhenVetoed,
   renderVetoButton,
 }) => {
   const q = question as ShortAnswerQuestion;
@@ -83,7 +82,6 @@ export const ShortAnswer: React.FC<QuestionComponentProps<string>> = ({
       onChange={onChange}
       onValidate={onValidate}
       renderQuestionText={renderQuestionText}
-      hideAnswerWhenVetoed={hideAnswerWhenVetoed}
       renderVetoButton={renderVetoButton}
     >
       <div className="relative">
