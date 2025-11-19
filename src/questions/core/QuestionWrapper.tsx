@@ -298,63 +298,69 @@ export function QuestionWrapper<T = unknown>({
       data-question-id={question.id}
       data-question-type={question.type}
     >
-      <div className="flex items-center gap-2 mb-2">
+      <div className="flex items-start gap-2">
         {priorityStyle === 'dot' && (
           <span className="text-sm" title={`Priority: ${question.priority}`}>
             {getPriorityIcon(question.priority)}
           </span>
         )}
         <div className="flex-1">
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            {renderQuestionText ? renderQuestionText(question as AnyQuestion) : question.text}
-          </label>
+          <div className="flex items-center gap-2 mb-1">
+            <label className="text-sm font-medium text-gray-700">
+              {renderQuestionText ? renderQuestionText(question as AnyQuestion) : question.text}
+            </label>
+            <div className="flex-grow"></div>
+            {question.allowVeto && (
+              <button
+                type="button"
+                onClick={handleVetoToggle}
+                disabled={disabled || readOnly}
+                className={
+                  vetoButtonClassName
+                    ? vetoButtonClassName(isVetoed)
+                    : `
+                  px-2 py-1 text-xs rounded-full border font-medium
+                  transition-colors duration-200
+                  ${
+                    isVetoed
+                      ? 'bg-amber-100 text-amber-700 border-amber-300 hover:bg-amber-200'
+                      : 'bg-gray-100 text-gray-700 border-gray-300 hover:bg-gray-200'
+                  }
+                  ${disabled || readOnly ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
+                `
+                }
+                title={isVetoed ? 'Click to unveto this question' : 'Click to veto this question'}
+              >
+                {isVetoed ? 'Unveto' : 'Veto'}
+              </button>
+            )}
+          </div>
+          <div className="flex gap-1 flex-wrap items-center mb-2">
+            {priorityStyle === 'chip' && (
+              <span
+                className={`px-2 py-1 text-xs rounded-full border ${getPriorityChipClass(question.priority)}`}
+              >
+                {question.priority.toUpperCase()}
+              </span>
+            )}
+            {question.required && !isVetoed && (
+              <span className="px-2 py-1 text-xs rounded-full bg-red-100 text-red-700 border border-red-300">
+                Required
+              </span>
+            )}
+            {question.tags &&
+              question.tags.length > 0 &&
+              question.tags.map((tag) => (
+                <span
+                  key={tag}
+                  className="px-2 py-1 text-xs bg-gray-100 text-gray-600 rounded-full"
+                >
+                  {tag}
+                </span>
+              ))}
+          </div>
           {question.description && (
             <p className="text-sm text-gray-600 mb-2">{question.description}</p>
-          )}
-        </div>
-        <div className="flex gap-1 flex-wrap items-center self-start">
-          {priorityStyle === 'chip' && (
-            <span
-              className={`px-2 py-1 text-xs rounded-full border ${getPriorityChipClass(question.priority)}`}
-            >
-              {question.priority.toUpperCase()}
-            </span>
-          )}
-          {question.required && !isVetoed && (
-            <span className="px-2 py-1 text-xs rounded-full bg-red-100 text-red-700 border border-red-300">
-              Required
-            </span>
-          )}
-          {question.tags &&
-            question.tags.length > 0 &&
-            question.tags.map((tag) => (
-              <span key={tag} className="px-2 py-1 text-xs bg-gray-100 text-gray-600 rounded-full">
-                {tag}
-              </span>
-            ))}
-          {question.allowVeto && (
-            <button
-              type="button"
-              onClick={handleVetoToggle}
-              disabled={disabled || readOnly}
-              className={
-                vetoButtonClassName
-                  ? vetoButtonClassName(isVetoed)
-                  : `
-                px-2 py-1 text-xs rounded-full border font-medium
-                transition-colors duration-200
-                ${
-                  isVetoed
-                    ? 'bg-amber-100 text-amber-700 border-amber-300 hover:bg-amber-200'
-                    : 'bg-gray-100 text-gray-700 border-gray-300 hover:bg-gray-200'
-                }
-                ${disabled || readOnly ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
-              `
-              }
-              title={isVetoed ? 'Click to unveto this question' : 'Click to veto this question'}
-            >
-              {isVetoed ? 'Unveto' : 'Veto'}
-            </button>
           )}
         </div>
       </div>

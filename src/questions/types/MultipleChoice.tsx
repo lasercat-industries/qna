@@ -146,8 +146,7 @@ export const MultipleChoice: React.FC<QuestionComponentProps<MultipleChoiceAnswe
           name={`question-${question.id}`}
           type={inputType}
           value={option.id}
-          onChange={q.multiple ? () => handleOptionChange(option.id) : undefined}
-          readOnly={!q.multiple}
+          onChange={q.multiple ? () => handleOptionChange(option.id) : () => {}}
         />
         <div className="flex-1">
           {option.image && (
